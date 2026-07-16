@@ -1,0 +1,434 @@
+<template>
+  <div class="page" onswipe="loadpageProccess">
+    <block if="{{uishow}}">
+      <image class="background" src="/common/title_bg.jpg"></image>
+    </block>
+    <block if="{{uishow}}">
+      <image class="logo" src="/pages/index/deactivelogo.png"></image>
+    </block>
+    <block if="{{uishow}}">
+      <image class="about" src="/pages/index/info.png" onclick="about"></image>
+    </block>
+    <block if="{{uishow}}">
+      <image class="settings" src="/pages/index/settings.png" onclick="settings"></image>
+    </block>
+    <div class="group-1">
+      <block if="{{uishow}}">
+        <text class="mid" onclick="start">开始游戏</text>
+      </block>
+      <block if="{{uishow}}">
+        <text class="mid" onclick="lastStart">从上次开始</text>
+      </block>
+      <block if="{{uishow}}">
+        <text class="mid" onclick="loadProccess">读取存档</text>
+      </block>
+      <block if="{{uishow}}">
+        <text class="mid" onclick="more">更多</text>
+      </block>
+    </div>
+    <block if="{{!uishow}}">
+      <image class="bc" src="/common/bcgi/空_夕空.jpg"></image>
+    </block>
+    <block if="{{!uishow}}">
+      <image class="reset2" src="/common/reset.png" onclick="reset"></image>
+    </block>
+    <block if="{{!uishow}}">
+      <image class="background2" src="/common/title_bg.jpg" onclick="hidui"></image>
+    </block>
+    <block if="{{uishow}}">
+      <image class="back" src="/common/go.png" onclick="die"></image>
+    </block>
+    <block if="{{loadShow}}">
+      <div class="page1">
+        <text class="load" onclick="unloadProccess">返回</text>
+        <scroll id="mainScroll" class="scroll" bounces="true">
+          <block for="{{item in saveSlots}}" tid="index">
+            <div class="save-item" onclick="loadSlot(index + 1)">
+              <text class="load">存档{{index + 1}}: {{item.text}}</text>
+            </div>
+          </block>
+          <text class="load2"></text>
+        </scroll>
+      </div>
+    </block>
+  </div>
+</template>
+
+<style>
+  .page {
+    background-color: rgb(248, 248, 255);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+  }
+  .about {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    top: 15px;
+    right: 250px;
+    position: absolute;
+  }
+  .hd {
+    position: absolute;
+    top: 0;
+  }
+  .background {
+    top: 0px;
+    position: absolute;
+  }
+  .background2 {
+    top: 100px;
+    position: absolute;
+  }
+  .reset2 {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    bottom: 15px;
+    right: 15px;
+    position: absolute;
+  }
+  .logo {
+    top: 95px;
+  }
+  .settings {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    top: 15px;
+    left: 250px;
+    position: absolute;
+  }
+  .reset {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    bottom: 100px;
+    right: 15px;
+    position: absolute;
+  }
+  .back {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    bottom: 15px;
+    right: 15px;
+    position: absolute;
+  }
+  .group-1 {
+    top: 75px;
+    flex-direction: column;
+    width: 80%;
+  }
+  .mid {
+    margin-bottom: 10px;
+    font-size: 35px;
+    color: #000000;
+    font-weight: 800;
+  }
+  .bc {
+    position: absolute;
+    width: 336px;
+    height: 480px;
+    top: 0;
+    left: 0;
+    background-color: rgb(116, 69, 47);
+    z-index: -1;
+  }
+  .page1 {
+    margin-top: auto;
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.88);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    width: 100%;
+  }
+  .page3 {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.88);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    width: 100%;
+    bottom: 0;
+    top: 0;
+  }
+  .load {
+    margin-top: 20px;
+    font-size: 35px;
+    color: #000000;
+    font-weight: 800;
+    width: 80%;
+    background-color: rgba(250, 233, 187, 0.51);
+  }
+  .load2 {
+    margin-top: 15px;
+    font-size: 40px;
+    color: #000000;
+    font-weight: 800;
+    width: 80%;
+  }
+  .scroll {
+    top: 5px;
+    height: 400px;
+    text-align: left;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 0;
+    flex: 1;
+    width: 100%;
+  }
+  .save-item {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+
+<script>
+  import system from '@system.app'
+  import storage from '@system.storage'
+  import router from '@system.router'
+  import prompt from '@system.prompt'
+
+  export default {
+    data: {
+      uishow: true,
+      readProgress: 1,
+      saveSlots: [
+        { id: 1, text: '空', progress: 1 },
+        { id: 2, text: '空', progress: 1 },
+        { id: 3, text: '空', progress: 1 },
+        { id: 4, text: '空', progress: 1 },
+        { id: 5, text: '空', progress: 1 }
+      ],
+      maxSaveSlots: 100,
+      loadShow: false,
+      loading: false,
+      bgIndex: 0,
+      bgList: [
+        '/common/title_bg0.jpg',
+        '/common/title_bg1.jpg',
+        '/common/title_bg2.jpg',
+        '/common/title_bg3.jpg',
+        '/common/title_bg4.jpg',
+        '/common/title_bg5.jpg',
+        '/common/title_bg6.jpg',
+        '/common/title_bg7.jpg',
+        '/common/title_bg8.jpg'
+      ],
+      bg: '/common/title_bg.jpg',
+      firstLaunchChecked: false
+    },
+    back() {},
+    loadingp() {
+      this.loading = !this.loading
+    },
+    hidui() {
+      this.uishow = !this.uishow
+    },
+    async onShow() {
+      this.checkFirstLaunch()
+      storage.get({
+        key: 'bg',
+        success: (data) => {
+          console.log('读取背景索引成功:', data)
+          let index = parseInt(data)
+          if (!isNaN(index) && index >= 0 && index < this.bgList.length) {
+            this.bgIndex = index
+            console.log('使用保存的背景索引:', this.bgIndex)
+          } else {
+            console.log('背景索引无效，使用默认值0')
+            this.bgIndex = 0
+          }
+          this.updateBackground()
+        },
+        fail: () => {
+          console.log('未找到背景设置，使用默认值')
+          this.updateBackground()
+        }
+      })
+      storage.get({
+        key: 'readProgress',
+        success: (data) => {
+          console.log('流动进度读取成功')
+          this.readProgress = Number(data) || 1
+        },
+        fail: (data) => {
+          console.log(`流动读取失败,${data}`)
+        }
+      })
+      await this.loadSaveSlots()
+    },
+    async loadSaveSlots() {
+      try {
+        let slots = await new Promise((resolve) => {
+          storage.get({
+            key: 'saveSlots',
+            success: (data) => {
+              if (data) {
+                try {
+                  let parsed = JSON.parse(data)
+                  resolve(parsed)
+                } catch (e) {
+                  resolve(null)
+                }
+              } else {
+                resolve(null)
+              }
+            },
+            fail: () => {
+              resolve(null)
+            }
+          })
+        })
+        if (slots && Array.isArray(slots)) {
+          this.saveSlots = slots
+        }
+        let promises = []
+        for (let i = 0; i < this.saveSlots.length; i++) {
+          let p = new Promise((resolve) => {
+            storage.get({
+              key: `p${i + 1}`,
+              success: (data) => {
+                let progress = Number(data) || 1
+                this.saveSlots[i].progress = progress
+                this.saveSlots[i].text = progress === 1 ? '空' : `进度${progress}`
+                resolve(true)
+              },
+              fail: (data) => {
+                console.log(`存档${i + 1}读取失败:`, data)
+                this.saveSlots[i].progress = 1
+                this.saveSlots[i].text = '空'
+                resolve(false)
+              }
+            })
+          })
+          promises.push(p)
+        }
+        await Promise.all(promises)
+        console.log(`加载了${this.saveSlots.length}个存档位`)
+      } catch (e) {
+        console.error('加载存档时出错:', e)
+      }
+    },
+    reset() {
+      this.bgIndex = (this.bgIndex + 1) % this.bgList.length
+      this.updateBackground()
+      storage.set({
+        key: 'bg',
+        value: String(this.bgIndex),
+        success: () => {
+          console.log(`背景索引保存成功: ${this.bgIndex}`)
+        },
+        fail: (data) => {
+          console.error('背景保存失败:', data)
+        }
+      })
+    },
+    updateBackground() {
+      let index = this.bgIndex % this.bgList.length
+      this.bg = this.bgList[index]
+    },
+    loadSlot(slot) {
+      console.log('加载存档:', slot)
+      storage.get({
+        key: `p${slot}`,
+        success: (data) => {
+          let progress = Number(data) || 1
+          console.log(`从存档${slot}读取进度:`, progress)
+          storage.set({
+            key: 'readProgress',
+            value: progress.toString(),
+            success: () => console.log('进度设置成功'),
+            fail: (err) => console.error('进度设置失败:', err)
+          })
+          router.replace({ uri: 'pages/detail' })
+          this.loadShow = false
+        },
+        fail: (data) => {
+          console.error(`读取存档${slot}失败:`, data)
+          prompt.showToast({ message: '加载失败', duration: 2000 })
+        }
+      })
+    },
+    about() {
+      router.push({ uri: 'pages/about' })
+    },
+    settings() {
+      router.push({ uri: 'pages/settings' })
+    },
+    more() {
+      router.push({ uri: 'pages/more' })
+    },
+    die() {
+      system.terminate()
+    },
+    start() {
+      this.loadingp()
+      storage.set({
+        key: 'readProgress',
+        value: JSON.stringify(1),
+        success: () => console.log('进度重置成功'),
+        fail: (err) => console.error('进度重置失败:', err)
+      })
+      router.replace({ uri: 'pages/detail' })
+    },
+    lastStart() {
+      this.loadingp()
+      router.replace({ uri: 'pages/detail' })
+    },
+    loadProccess() {
+      this.loadShow = true
+    },
+    unloadProccess() {
+      this.loadShow = false
+    },
+    loadpageProccess(e) {
+      if (this.loadShow === true && e.direction === 'right') {
+        this.loadShow = false
+      }
+    },
+    checkFirstLaunch() {
+      if (this.firstLaunchChecked) return
+      this.firstLaunchChecked = true
+      storage.get({
+        key: 'hasLaunchedBefore2',
+        success: (data) => {
+          if (data !== 'true') {
+            storage.set({
+              key: 'hasLaunchedBefore2',
+              value: 'true',
+              success: () => {},
+              fail: () => {}
+            })
+            router.push({ uri: 'pages/about' })
+          }
+        },
+        fail: () => {
+          storage.set({
+            key: 'hasLaunchedBefore2',
+            value: 'true',
+            success: () => {},
+            fail: () => {}
+          })
+          router.push({ uri: 'pages/about' })
+        }
+      })
+    }
+  }
+</script>

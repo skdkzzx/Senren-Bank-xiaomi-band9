@@ -1,0 +1,423 @@
+<template>
+  <div class="page">
+    <image class="bcg" src="/common/bcgi/空_夕空.jpg"></image>
+    <scroll id="mainScroll" class="scroll">
+      <block if="{{page === 1}}">
+        <div class="page1">
+          <div class="content1">
+            <text class="mid1">共通线</text>
+          </div>
+          <block for="{{item in commonChapters}}" tid="line">
+            <div class="content" onclick="loadStart(item.line)">
+              <text class="mid">{{item.label}}</text>
+              <text class="mid2">↓</text>
+            </div>
+          </block>
+          <text class="mid">◆</text>
+          <text class="mid2"></text>
+        </div>
+      </block>
+      <block if="{{page === 2}}">
+        <div class="page1">
+          <div class="content1">
+            <text class="mid1">朝武 芳乃</text>
+          </div>
+          <block for="{{item in firstChapters}}" tid="line">
+            <div class="content" onclick="loadStart(item.line)">
+              <text class="mid">{{item.label}}</text>
+              <text class="mid2">↓</text>
+            </div>
+          </block>
+          <text class="mid" onclick="loadStart(18291)">后日谈</text>
+          <text class="mid2"></text>
+        </div>
+      </block>
+      <block if="{{page === 3}}">
+        <div class="page1">
+          <div class="content1">
+            <text class="mid1">常陆 茉子</text>
+          </div>
+          <block for="{{item in secondChapters}}" tid="line">
+            <div class="content" onclick="loadStart(item.line)">
+              <text class="mid">{{item.label}}</text>
+              <text class="mid2">↓</text>
+            </div>
+          </block>
+          <text class="mid" onclick="loadStart(27530)">后日谈</text>
+          <text class="mid2"></text>
+        </div>
+      </block>
+      <block if="{{page === 4}}">
+        <div class="page1">
+          <div class="content1">
+            <text class="mid1">丛雨</text>
+          </div>
+          <block for="{{item in thirdChapters}}" tid="line">
+            <div class="content" onclick="loadStart(item.line)">
+              <text class="mid">{{item.label}}</text>
+              <text class="mid2">↓</text>
+            </div>
+          </block>
+          <text class="mid" onclick="loadStart(38389)">后日谈</text>
+          <text class="mid2"></text>
+        </div>
+      </block>
+      <block if="{{page === 5}}">
+        <div class="page1">
+          <div class="content1">
+            <text class="mid1">蕾娜·列支敦瑙尔</text>
+          </div>
+          <block for="{{item in fourthChapters}}" tid="line">
+            <div class="content" onclick="loadStart(item.line)">
+              <text class="mid">{{item.label}}</text>
+              <text class="mid2">↓</text>
+            </div>
+          </block>
+          <text class="mid" onclick="loadStart(48482)">后日谈</text>
+          <text class="mid2"></text>
+        </div>
+      </block>
+      <block if="{{page === 6}}">
+        <div class="page1">
+          <div class="content1">
+            <text class="mid1">鞍马 小春</text>
+          </div>
+          <block for="{{item in fifthChapters}}" tid="line">
+            <div class="content" onclick="loadStart(item.line)">
+              <text class="mid">{{item.label}}</text>
+              <text class="mid2">↓</text>
+            </div>
+          </block>
+          <text class="mid" onclick="loadStart(53483)">后日谈</text>
+          <text class="mid2"></text>
+        </div>
+      </block>
+      <block if="{{page === 7}}">
+        <div class="page1">
+          <div class="content1">
+            <text class="mid1">马庭 芦花</text>
+          </div>
+          <block for="{{item in sixthChapters}}" tid="line">
+            <div class="content" onclick="loadStart(item.line)">
+              <text class="mid">{{item.label}}</text>
+              <text class="mid2">↓</text>
+            </div>
+          </block>
+          <text class="mid" onclick="loadStart(55422)">后日谈</text>
+          <text class="mid2"></text>
+        </div>
+      </block>
+    </scroll>
+    <image class="bt" src="/common/bt.png"></image>
+    <image class="hd" src="/common/hd.png"></image>
+    <text class="title1">点击跳转至对应进度</text>
+    <div class="header">
+      <text class="title">流程图</text>
+    </div>
+    <image class="back-btn" src="/common/back.png" onclick="back"></image>
+    <image class="last-btn" src="/common/back.png" onclick="last"></image>
+    <image class="enter-btn" src="/common/go.png" onclick="enter"></image>
+  </div>
+</template>
+
+<style>
+  .page {
+    background-color: #bbbbbb;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .page1 {
+    background-color: #ffffff00;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+  }
+  .bcg {
+    position: absolute;
+    width: 336px;
+    height: 480px;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+  .mid {
+    font-size: 24px;
+    color: #000000;
+    background-color: rgba(255, 255, 255, 0.73);
+    width: 250px;
+    border-radius: 15px;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    border-top-color: #e0e0e0;
+    border-right-color: #e0e0e0;
+    border-bottom-color: #e0e0e0;
+    border-left-color: #e0e0e0;
+    border-style: solid;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    text-align: center;
+  }
+  .mid1 {
+    font-size: 35px;
+    color: #ffffff;
+    font-weight: 800;
+  }
+  .mid2 {
+    font-size: 35px;
+    color: rgba(255, 255, 255, 0.73);
+    font-weight: 800;
+  }
+  .bt {
+    position: absolute;
+    bottom: 0;
+  }
+  .hd {
+    position: absolute;
+    top: 0;
+  }
+  .header {
+    position: absolute;
+    top: 0px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+  }
+  .scroll {
+    background-color: #ffffff00;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    flex: 1;
+  }
+  .title {
+    font-size: 36px;
+    color: #ebebeb;
+    font-weight: bold;
+  }
+  .title1 {
+    bottom: 5px;
+    position: absolute;
+    font-size: 22px;
+    color: #757575;
+    font-weight: bold;
+  }
+  .back-btn {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+  }
+  .last-btn {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+  }
+  .enter-btn {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+  }
+  .content {
+    flex-direction: column;
+    align-items: center;
+  }
+  .content1 {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.32);
+    border-radius: 15px;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    border-top-color: #e0e0e0;
+    border-right-color: #e0e0e0;
+    border-bottom-color: #e0e0e0;
+    border-left-color: #e0e0e0;
+    border-style: solid;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    margin-top: 75px;
+    margin-bottom: 15px;
+  }
+</style>
+
+<script>
+  import storage from '@system.storage'
+  import router from '@system.router'
+
+  export default {
+    data: {
+      page: 1,
+      commonChapters: [
+        { line: 1, label: 'CHAPTER1-1' },
+        { line: 810, label: 'CHAPTER1-2' },
+        { line: 1367, label: 'CHAPTER1-3' },
+        { line: 2321, label: 'CHAPTER2-1' },
+        { line: 2435, label: 'CHAPTER2-2' },
+        { line: 2812, label: 'CHAPTER2-3' },
+        { line: 2993, label: 'CHAPTER2-4' },
+        { line: 3120, label: 'CHAPTER2-5' },
+        { line: 3749, label: 'CHAPTER2-6' },
+        { line: 4330, label: 'CHAPTER2-7' },
+        { line: 4524, label: 'CHAPTER3-1' },
+        { line: 5302, label: 'CHAPTER3-2' },
+        { line: 6517, label: 'CHAPTER3-3' },
+        { line: 6950, label: 'CHAPTER3-4' },
+        { line: 7724, label: 'CHAPTER3-5' },
+        { line: 8235, label: 'CHAPTER3-6' },
+        { line: 8886, label: 'CHAPTER3-7' }
+      ],
+      firstChapters: [
+        { line: 9181, label: 'CHAPTER3-8' },
+        { line: 9468, label: 'CHAPTER4-1' },
+        { line: 10091, label: 'CHAPTER4-2' },
+        { line: 10894, label: 'CHAPTER4-3' },
+        { line: 11556, label: 'CHAPTER5-1' },
+        { line: 12220, label: 'CHAPTER5-2' },
+        { line: 12545, label: 'CHAPTER5-3' },
+        { line: 13205, label: 'CHAPTER5-3' },
+        { line: 13344, label: 'CHAPTER5-4' },
+        { line: 13902, label: 'CHAPTER5-5' },
+        { line: 14017, label: 'CHAPTER5-5' },
+        { line: 14663, label: 'CHAPTER6-1' },
+        { line: 14889, label: 'CHAPTER6-2' },
+        { line: 16030, label: 'CHAPTER7-1' },
+        { line: 16550, label: 'CHAPTER7-2' },
+        { line: 17289, label: 'CHAPTER7-3' }
+      ],
+      secondChapters: [
+        { line: 19000, label: 'CHAPTER3-8' },
+        { line: 19212, label: 'CHAPTER4-1' },
+        { line: 19850, label: 'CHAPTER4-2' },
+        { line: 20019, label: 'CHAPTER4-3' },
+        { line: 20862, label: 'CHAPTER5-1' },
+        { line: 21343, label: 'CHAPTER5-2' },
+        { line: 21938, label: 'CHAPTER5-3' },
+        { line: 23059, label: 'CHAPTER6-1' },
+        { line: 23394, label: 'CHAPTER6-2' },
+        { line: 23692, label: 'CHAPTER6-3' },
+        { line: 23715, label: 'CHAPTER6-4' },
+        { line: 23920, label: 'CHAPTER6-5' },
+        { line: 24767, label: 'CHAPTER7-1' },
+        { line: 25728, label: 'CHAPTER7-2' }
+      ],
+      thirdChapters: [
+        { line: 28136, label: 'CHAPTER4-1' },
+        { line: 28763, label: 'CHAPTER4-2' },
+        { line: 29175, label: 'CHAPTER4-3' },
+        { line: 29518, label: 'CHAPTER4-4' },
+        { line: 30069, label: 'CHAPTER5-1' },
+        { line: 30408, label: 'CHAPTER5-2' },
+        { line: 30706, label: 'CHAPTER5-3' },
+        { line: 31313, label: 'CHAPTER5-4' },
+        { line: 32563, label: 'CHAPTER6-1' },
+        { line: 32980, label: 'CHAPTER6-2' },
+        { line: 33166, label: 'CHAPTER6-3' },
+        { line: 33420, label: 'CHAPTER6-4' },
+        { line: 34304, label: 'CHAPTER7-1' },
+        { line: 34877, label: 'CHAPTER7-2' },
+        { line: 35120, label: 'CHAPTER7-3' },
+        { line: 35564, label: 'CHAPTER8-1' },
+        { line: 36167, label: 'CHAPTER8-2' },
+        { line: 36740, label: 'CHAPTER8-3' },
+        { line: 37249, label: 'CHAPTER8-4' },
+        { line: 37357, label: 'CHAPTER8-5' },
+        { line: 38025, label: 'CHAPTER9-1' },
+        { line: 38222, label: 'CHAPTER9-2' }
+      ],
+      fourthChapters: [
+        { line: 39159, label: 'CHAPTER3-6' },
+        { line: 39875, label: 'CHAPTER4-1' },
+        { line: 40257, label: 'CHAPTER4-2' },
+        { line: 40891, label: 'CHAPTER5-1' },
+        { line: 41710, label: 'CHAPTER5-2' },
+        { line: 42391, label: 'CHAPTER5-3' },
+        { line: 43025, label: 'CHAPTER5-4' },
+        { line: 43638, label: 'CHAPTER6-1' },
+        { line: 44095, label: 'CHAPTER6-2' },
+        { line: 44924, label: 'CHAPTER7-1' },
+        { line: 46030, label: 'CHAPTER7-2' },
+        { line: 46517, label: 'CHAPTER7-3' },
+        { line: 46814, label: 'CHAPTER8-1' },
+        { line: 47393, label: 'CHAPTER8-2' }
+      ],
+      fifthChapters: [
+        { line: 1, label: '小春&芦花の共通线' },
+        { line: 48622, label: 'CHAPTER4-1' },
+        { line: 48995, label: 'CHAPTER4-2' },
+        { line: 49383, label: 'CHAPTER4-3' },
+        { line: 49835, label: 'CHAPTER4-4' },
+        { line: 50046, label: 'CHAPTER4-5' },
+        { line: 50323, label: 'CHAPTER5-1' },
+        { line: 50596, label: 'CHAPTER5-2' },
+        { line: 50901, label: 'CHAPTER6-1' },
+        { line: 51189, label: 'CHAPTER6-2' },
+        { line: 51228, label: 'CHAPTER6-3' },
+        { line: 51387, label: 'CHAPTER6-4' },
+        { line: 51559, label: 'CHAPTER6-4' },
+        { line: 51750, label: 'CHAPTER6-5' },
+        { line: 51769, label: 'CHAPTER7-1' },
+        { line: 1, label: '小春线' },
+        { line: 51976, label: 'CHAPTER8-1' },
+        { line: 52097, label: 'CHAPTER8-2' },
+        { line: 52913, label: 'CHAPTER8-3' },
+        { line: 52992, label: 'CHAPTER8-4' }
+      ],
+      sixthChapters: [
+        { line: 1, label: '芦花线' },
+        { line: 53926, label: 'CHAPTER8-1' },
+        { line: 54910, label: 'CHAPTER8-2' }
+      ]
+    },
+    async loadStart(progress) {
+      try {
+        await new Promise((resolve, reject) => {
+          storage.set({
+            key: 'readProgress',
+            value: progress.toString(),
+            success: resolve,
+            fail: reject
+          })
+        })
+        console.log('进度设置成功')
+        router.push({ uri: 'pages/detail' })
+      } catch (e) {
+        console.error('进度设置失败:', e)
+      }
+    },
+    back() {
+      router.back({ uri: 'pages/more' })
+    },
+    last() {
+      if (this.page > 1) {
+        this.page -= 1
+      } else {
+        this.page = 7
+      }
+    },
+    enter() {
+      if (this.page < 7) {
+        this.page += 1
+      } else {
+        this.page = 1
+      }
+    }
+  }
+</script>

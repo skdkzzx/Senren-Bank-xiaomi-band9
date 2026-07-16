@@ -1,0 +1,2234 @@
+<template>
+  <div class="page" onswipe="pageSwipe" onlongpress="displayPage" onclick="playPage">
+    <image class="backgroundimg {{currentBackgroundScaleClass}}" src="{{currentBackground}}" onerror="onImageError('background', currentBackground, $event)"></image>
+    <block if="{{showNextBackground}}">
+      <image class="backgroundimg next-background {{nextBackgroundScaleClass}}" src="{{nextBackground}}" onerror="onImageError('nextBackground', nextBackground, $event)"></image>
+    </block>
+    <block if="{{cgimg}}">
+      <image class="cgimg" src="{{cgimg}}" onerror="onImageError('cg', cgimg, $event)"></image>
+    </block>
+    <block if="{{showNextCg}}">
+      <image class="cgimg next-cg" src="{{nextCg}}" onerror="onImageError('nextCg', nextCg, $event)"></image>
+    </block>
+    <block if="{{characterimg}}">
+      <div class="character-container">
+        <image class="characterimg {{currentCharacterScaleClass}}" src="{{characterimg}}" onerror="onImageError('character', characterimg, $event)"></image>
+      </div>
+    </block>
+    <block if="{{nextCharacterImg && showNextCharacter}}">
+      <div class="character-container">
+        <image class="characterimg next-character {{nextCharacterScaleClass}}" src="{{nextCharacterImg}}" onerror="onImageError('nextCharacter', nextCharacterImg, $event)"></image>
+      </div>
+    </block>
+    <block if="{{pageShow && !hideText && !isEnding}}">
+      <image class="board" src="/pages/detail/board.png" onclick="nextPage"></image>
+    </block>
+    <block if="{{pageShow && !hideText && !isEnding}}">
+      <text class="character" style="color: {{viewed ? readColor : unreadColor}}; font-weight: {{boldText ? 'bold' : 'normal'}};">{{displayCharacter}}</text>
+    </block>
+    <block if="{{!isEnding}}">
+      <scroll id="Scroll" class="scroll2" onclick="nextPage" bounces="true">
+        <block if="{{pageShow && !hideText}}">
+          <text class="contect" style="color: {{viewed ? readColor : unreadColor}}; font-size: {{currentTextFontSize}}px; font-weight: {{boldText ? 'bold' : 'normal'}};">{{displayText}}</text>
+        </block>
+      </scroll>
+    </block>
+    <block if="{{isAnimating}}">
+      <div class="background-mask" style="background-color: {{maskColor}};"></div>
+    </block>
+    <block if="{{showFlashbang}}">
+      <div class="flashbang-mask" onclick="nextPage" style="opacity: {{flashbangOpacity}};"></div>
+    </block>
+    <block if="{{isAutoing && !contrlcenterShow && !isAnimating && !isEnding}}">
+      <div class="skip-btn2" onclick="stopAutoplay">
+        <text>停止自动播放</text>
+      </div>
+    </block>
+    <block if="{{isGoing && !contrlcenterShow && !isAnimating && !isEnding}}">
+      <div class="skip-btn3" onclick="stopQuickGo">
+        <text>停止快进</text>
+      </div>
+    </block>
+    <block if="{{isBacking && !contrlcenterShow && !isAnimating && !isEnding}}">
+      <div class="skip-btn4" onclick="stopQuickBack">
+        <text>停止快退</text>
+      </div>
+    </block>
+    <block if="{{choose && pageShow && !isAnimating && !isEnding}}">
+      <div class="choose">
+        <block if="{{choose1Visible}}">
+          <text class="choosetext" onclick="choose1c" style="color: {{choose1Color}};">{{choose1}}</text>
+        </block>
+        <block if="{{choose2Visible}}">
+          <text class="choosetext" onclick="choose2c" style="color: {{choose2Color}};">{{choose2}}</text>
+        </block>
+        <block if="{{choose3Visible}}">
+          <text class="choosetext" onclick="choose3c" style="color: {{choose3Color}};">{{choose3}}</text>
+        </block>
+        <block if="{{choose4Visible}}">
+          <text class="choosetext" onclick="choose4c" style="color: {{choose4Color}};">{{choose4}}</text>
+        </block>
+        <block if="{{choose5Visible}}">
+          <text class="choosetext" onclick="choose5c" style="color: {{choose5Color}};">{{choose5}}</text>
+        </block>
+      </div>
+    </block>
+    <block if="{{contrlcenterShow && !isAnimating && !isEnding}}">
+      <div class="page1" onswipe="controlCenterSwipe">
+        <scroll id="mainScroll" class="scroll" bounces="true">
+          <text class="load2">{{nowTime}} | {{readProgress}}</text>
+          <text class="load" onclick="hidecontrlcenter">返回</text>
+          <text class="load" onclick="saveconShow">保存</text>
+          <text class="load" onclick="loadconShow">加载</text>
+          <text class="load" onclick="quickSave">快速存档</text>
+          <text class="load" onclick="loadStart(1)">快速读档</text>
+          <text class="load" onclick="indexRoute">返回主页</text>
+          <text class="load" onclick="settingsRoute">设置</text>
+          <text class="load" onclick="lctRoute">流程图</text>
+          <block if="{{!isBacking && !isGoing}}">
+            <text class="load" onclick="autoplay">{{isAutoing ? '停止自动播放' : '自动播放'}}</text>
+          </block>
+          <block if="{{!isBacking && !isAutoing}}">
+            <text class="load" onclick="quickgo">{{isGoing ? '停止快进' : '快进'}}</text>
+          </block>
+          <block if="{{!isAutoing && !isGoing}}">
+            <text class="load" onclick="quickback">{{isBacking ? '停止快退' : '快退'}}</text>
+          </block>
+          <text class="load2"></text>
+        </scroll>
+      </div>
+    </block>
+    <block if="{{loadShow && !isAnimating && !isEnding}}">
+      <div class="page1" onswipe="loadSaveSwipe">
+        <text class="load3" onclick="loadconShow">点击跳转至对应页面</text>
+        <scroll id="loadScroll" class="scroll" bounces="true">
+          <block for="{{item in saveSlots}}" tid="index">
+            <div class="save-item" onclick="loadSlot(index + 1)">
+              <text class="load">存档{{index + 1}}: {{item.text}}</text>
+            </div>
+          </block>
+          <text class="load2"></text>
+        </scroll>
+      </div>
+    </block>
+    <block if="{{saveShow && !isAnimating && !isEnding}}">
+      <div class="page1" onswipe="loadSaveSwipe">
+        <text class="load3" onclick="saveconShow">长按删除存档位</text>
+        <scroll id="saveScroll" class="scroll" bounces="true">
+          <block for="{{item in saveSlots}}" tid="index">
+            <div class="save-item">
+              <text class="load" onlongpress="deleteSlot(index + 1)" onclick="saveToSlot(index + 1)">存档{{index + 1}}: {{item.text}}</text>
+            </div>
+          </block>
+          <div class="save-add" onclick="addSaveSlot">
+            <text class="load">[ + 添加存档位 ]</text>
+          </div>
+          <text class="load2"></text>
+        </scroll>
+      </div>
+    </block>
+    <block if="{{isEnding && endAnimationDone}}">
+      <div class="end-overlay" onclick="endClickReturn">
+        <text class="end-text">{{endText}}</text>
+      </div>
+    </block>
+  </div>
+</template>
+
+<style>
+  .page {
+    background-color: rgb(255, 255, 255);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    width: 336px;
+    height: 480px;
+    position: relative;
+    overflow: hidden;
+  }
+  .backgroundimg {
+    position: absolute;
+    flex-direction: column;
+    align-items: center;
+    object-fit: cover;
+    object-position: center;
+    height: 480px;
+    width: 100%;
+    z-index: 1;
+  }
+  .next-background {
+    z-index: 1;
+  }
+  .bg-scale-1 {
+    transform: scale(1, 1) translate(0px, 0px);
+  }
+  .bg-scale-11 {
+    transform: scale(1.1, 1.1) translate(-20px, -20px);
+  }
+  .cgimg {
+    position: absolute;
+    flex-direction: column;
+    align-items: center;
+    object-fit: cover;
+    object-position: center;
+    height: 100%;
+    width: 336px;
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+  .next-cg {
+    z-index: 2;
+  }
+  .character-container {
+    position: absolute;
+    justify-content: center;
+    width: 336px;
+    height: 480px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    top: 0;
+    left: 0;
+  }
+  .characterimg {
+    position: relative;
+    flex: 0 0 auto;
+    height: 100%;
+    z-index: 3;
+    top: 60px;
+  }
+  .next-character {
+    z-index: 3;
+  }
+  .character-scale-07 {
+    transform: scale(0.6, 0.6) translate(50px, 45px);
+  }
+  .character-scale-12 {
+    transform: scale(1.2, 1.2) translate(-20px, 15px);
+  }
+  .character-scale-1 {
+    transform: scale(1, 1) translate(0px, 40px);
+  }
+  .background-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 4;
+  }
+  .flashbang-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    z-index: 1000;
+  }
+  .board {
+    position: absolute;
+    object-fit: contain;
+    bottom: 0;
+    z-index: 5;
+  }
+  .character {
+    position: absolute;
+    top: 290px;
+    left: 30px;
+    right: 5px;
+    font-size: 24px;
+    color: #ffffff;
+    z-index: 6;
+  }
+  .scroll2 {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    position: absolute;
+    top: 330px;
+    bottom: 0px;
+    left: 15px;
+    right: 15px;
+    z-index: 6;
+  }
+  .contect {
+    font-size: 30px;
+    font-weight: 100;
+    color: #d495d4;
+  }
+  .choose {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: absolute;
+    top: 80px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10;
+    width: 100%;
+  }
+  .choosetext {
+    color: #ffffff;
+    margin-top: 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 4px;
+    padding-right: 8px;
+    padding-bottom: 4px;
+    padding-left: 8px;
+    border-radius: 10px;
+    font-size: 30px;
+    font-weight: 800;
+    width: 260px;
+    box-sizing: border-box;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: normal;
+    word-break: break-word;
+  }
+  .skip-btn2 {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 5px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    border-radius: 10px;
+    font-size: 24px;
+    color: #ffffff50;
+  }
+  .skip-btn3 {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 5px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    border-radius: 10px;
+    font-size: 24px;
+    color: #ffffff50;
+  }
+  .skip-btn4 {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 5px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    border-radius: 10px;
+    font-size: 24px;
+    color: #ffffff50;
+  }
+  .page1 {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.86);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: auto;
+    margin-right: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    width: 100%;
+    bottom: 0;
+    top: 0;
+    z-index: 20;
+  }
+  .load {
+    margin-top: 20px;
+    font-size: 35px;
+    color: #232525f6;
+    font-weight: 800;
+    width: 80%;
+    background-color: rgba(250, 233, 187, 0.51);
+    text-align: center;
+  }
+  .load2 {
+    margin-top: 15px;
+    font-size: 35px;
+    color: #232525f6;
+    font-weight: 800;
+    width: 80%;
+    text-align: center;
+  }
+  .load3 {
+    margin-top: 20px;
+    font-size: 24px;
+    color: #232525f6;
+    width: 80%;
+    background-color: rgba(250, 233, 187, 0.51);
+    text-align: center;
+  }
+  .scroll {
+    top: 5px;
+    height: 400px;
+    text-align: left;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 0;
+    flex: 1;
+    width: 100%;
+  }
+  .save-item {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .save-add {
+    justify-content: center;
+    align-items: center;
+  }
+  .end-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+  .end-text {
+    font-size: 36px;
+    font-weight: bold;
+    color: #000000;
+    text-align: center;
+    padding-top: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+  }
+</style>
+
+<script>
+  import prompt from '@system.prompt'
+  import brightness from '@system.brightness'
+  import storage from '@system.storage'
+  import router from '@system.router'
+  import file from '@system.file'
+
+  class GameScriptLoader {
+    constructor() {
+      this.scripts = {}
+      this.isLoaded = false
+      this.loadPromise = null
+      this.chunkSize = 500
+      this.maxRetries = 2
+      this.retryDelay = 150
+      this.loadedChunks = {}
+      this.currentChunk = 1
+      this.pendingLoads = {}
+      this.totalScriptsCount = 0
+      this.lastMemoryCheck = 0
+    }
+
+    async loadGameScript() {
+      if (this.loadPromise) return this.loadPromise
+      if (this.isLoaded) return true
+      this.loadPromise = new Promise(async (resolve) => {
+        try {
+          console.log('启动游戏脚本加载...')
+          this.scripts = {}
+          this.loadedChunks = {}
+          await this.loadMinimalChunk(1)
+          this.isLoaded = true
+          console.log('游戏脚本极简加载完成')
+          resolve(true)
+        } catch (e) {
+          console.error('游戏脚本加载失败，使用备用脚本:', e)
+          this.scripts = this.getEssentialScripts()
+          this.isLoaded = true
+          console.log('使用备用脚本数据')
+          resolve(true)
+        } finally {
+          this.loadPromise = null
+        }
+      })
+      return this.loadPromise
+    }
+
+    async loadMinimalChunk(chunkNum) {
+      if (this.loadedChunks[chunkNum]) return true
+      if (this.pendingLoads[chunkNum]) {
+        return new Promise((resolve) => {
+          let checkInterval = setInterval(() => {
+            if (this.loadedChunks[chunkNum]) {
+              clearInterval(checkInterval)
+              resolve(true)
+            }
+          }, 50)
+        })
+      }
+      this.pendingLoads[chunkNum] = true
+      return new Promise((resolve) => {
+        let filePath = `/common/script/scriptData${chunkNum}.txt`
+        file.readText({
+          uri: filePath,
+          success: (data) => {
+            try {
+              let text = typeof data === 'string' ? data : (data.text || '')
+              let parsed = this.parseChunkMinimal(text, chunkNum)
+              this.addScriptsSparse(parsed)
+              this.loadedChunks[chunkNum] = true
+              this.totalScriptsCount += Object.keys(parsed).length
+              console.log(`块 ${chunkNum} 精简加载完成，新增 ${Object.keys(parsed).length} 个脚本`)
+              this.cleanupOldChunks(chunkNum)
+              resolve(true)
+            } catch (e) {
+              console.error(`处理块 ${chunkNum} 失败:`, e)
+              this.loadedChunks[chunkNum] = true
+              resolve(false)
+            } finally {
+              delete this.pendingLoads[chunkNum]
+            }
+          },
+          fail: (err) => {
+            console.error(`加载块 ${chunkNum} 失败:`, err)
+            this.loadedChunks[chunkNum] = true
+            delete this.pendingLoads[chunkNum]
+            resolve(false)
+          }
+        })
+      })
+    }
+
+    parseChunkMinimal(text, chunkNum) {
+      if (!text || text.trim() === '') return {}
+      let cleaned = text.trim()
+      if (cleaned.charCodeAt(0) === 65279) cleaned = cleaned.substring(1)
+      if (cleaned.startsWith('{') && cleaned.endsWith('}')) {
+        try { return JSON.parse(cleaned) } catch (e) { console.error(`解析块 ${chunkNum} JSON失败:`, e) }
+      }
+      return {}
+    }
+
+    addScriptsSparse(newScripts) {
+      for (let key in newScripts) {
+        if (newScripts.hasOwnProperty(key)) {
+          this.scripts[key] = newScripts[key]
+        }
+      }
+    }
+
+    cleanupOldChunks(currentChunk) {
+      let keepChunks = { [currentChunk]: true, [currentChunk - 1]: true, [currentChunk + 1]: true }
+      for (let chunkId in this.loadedChunks) {
+        let id = parseInt(chunkId)
+        if (!keepChunks[id]) {
+          this.removeChunkScripts(id)
+          delete this.loadedChunks[chunkId]
+        }
+      }
+    }
+
+    removeChunkScripts(chunkNum) {
+      let start = (chunkNum - 1) * this.chunkSize + 1
+      let end = chunkNum * this.chunkSize
+      let removed = 0
+      for (let i = start; i <= end; i++) {
+        let key = i.toString()
+        if (this.scripts[key]) {
+          delete this.scripts[key]
+          removed++
+        }
+      }
+      if (removed > 0) console.log(`清理块 ${chunkNum}，释放 ${removed} 个脚本`)
+    }
+
+    async smartLoadForProgress(progress) {
+      let targetChunk = Math.ceil(progress / this.chunkSize)
+      if (targetChunk !== this.currentChunk) this.currentChunk = targetChunk
+      if (!this.loadedChunks[targetChunk]) await this.loadMinimalChunk(targetChunk)
+      let offset = progress % this.chunkSize || this.chunkSize
+      if (offset >= this.chunkSize - 10) {
+        let nextChunk = targetChunk + 1
+        if (!this.loadedChunks[nextChunk] && !this.pendingLoads[nextChunk]) {
+          setTimeout(() => { this.loadMinimalChunk(nextChunk).catch(() => {}) }, 100)
+        }
+      } else if (offset <= 10 && targetChunk > 1) {
+        let prevChunk = targetChunk - 1
+        if (!this.loadedChunks[prevChunk] && !this.pendingLoads[prevChunk]) {
+          setTimeout(() => { this.loadMinimalChunk(prevChunk).catch(() => {}) }, 100)
+        }
+      }
+    }
+
+    async getScript(id) {
+      let key = id.toString()
+      if (!this.isLoaded) return this.getFallbackScript(id)
+      await this.smartLoadForProgress(id)
+      let raw = this.scripts[key]
+      if (!raw) {
+        console.warn(`脚本 ${id} 不存在`)
+        return this.getFallbackScript(id)
+      }
+      return {
+        id: id,
+        background: raw.b ? `/common/bcgi/${raw.b}.jpg` : '',
+        character: raw.c ? `/common/cimg/${raw.c}.png` : '',
+        cg: raw.cg ? `/common/evig/${raw.cg}` : '',
+        speaker: raw.s || '',
+        text: raw.t || '',
+        z: raw.z || 0,
+        choose: !!raw.co,
+        choose1: raw.c1 || '',
+        choose2: raw.c2 || '',
+        choose3: raw.c3 || '',
+        choose4: raw.c4 || '',
+        choose5: raw.c5 || '',
+        choose1To: raw.c1t || id,
+        choose2To: raw.c2t || id,
+        choose3To: raw.c3t || id,
+        choose4To: raw.c4t || id,
+        choose5To: raw.c5t || id
+      }
+    }
+
+    getFallbackScript(id = 0) {
+      return {
+        id: id,
+        background: '/common/bcgi/画面_白.jpg',
+        character: '',
+        cg: '',
+        speaker: '',
+        text: '（脚本加载失败，显示备用内容）',
+        z: 0,
+        choose: false,
+        choose1: '', choose2: '', choose3: '', choose4: '', choose5: '',
+        choose1To: id || 0, choose2To: id || 0, choose3To: id || 0, choose4To: id || 0, choose5To: id || 0
+      }
+    }
+
+    getEssentialScripts() {
+      return {
+        1: { b: '異世界_前景a', s: '系统', t: '游戏启动中...' },
+        2: { b: '異世界_前景a', s: '', t: '请稍候...' },
+        3: { b: '異世界_前景a', s: '', t: '正在初始化...' }
+      }
+    }
+
+    hasNext(id) {
+      let nextId = (parseInt(id) + 1).toString()
+      return this.scripts.hasOwnProperty(nextId)
+    }
+
+    getNextProgressId(id) {
+      let nextId = parseInt(id) + 1
+      return this.scripts.hasOwnProperty(nextId.toString()) ? nextId : null
+    }
+
+    getTotalProgress() {
+      return this.totalScriptsCount
+    }
+
+    forceCleanup() {
+      let chunk = this.currentChunk
+      let start = (chunk - 1) * this.chunkSize + 1
+      let end = chunk * this.chunkSize
+      let newScripts = {}
+      let count = 0
+      for (let i = start; i <= end; i++) {
+        let key = i.toString()
+        if (this.scripts[key]) {
+          newScripts[key] = this.scripts[key]
+          count++
+        }
+      }
+      this.scripts = newScripts
+      this.loadedChunks = { [chunk]: true }
+      this.totalScriptsCount = count
+      console.log(`强制内存清理完成，保留 ${count} 个脚本`)
+    }
+
+    getMemoryStatus() {
+      let chunks = []
+      for (let id in this.loadedChunks) chunks.push(parseInt(id))
+      return {
+        loadedChunks: chunks.length,
+        totalScripts: this.totalScriptsCount,
+        currentChunk: this.currentChunk,
+        memory: `${Math.round(this.totalScriptsCount * 0.3)}KB`
+      }
+    }
+
+    async preloadRange(startId, endId) {
+      let startChunk = Math.ceil(startId / this.chunkSize)
+      let endChunk = Math.ceil(endId / this.chunkSize)
+      let loaded = 0
+      for (let c = startChunk; c <= endChunk && loaded < 3; c++) {
+        if (!this.loadedChunks[c]) {
+          await this.loadMinimalChunk(c)
+          loaded++
+        }
+      }
+      if (loaded > 0) console.log(`预加载完成，加载了 ${loaded} 个块`)
+    }
+
+    clearAll() {
+      this.scripts = {}
+      this.loadedChunks = {}
+      this.pendingLoads = {}
+      this.totalScriptsCount = 0
+      console.log('所有内存已清空')
+    }
+  }
+
+  export default {
+    data: {
+      unreadColor: '#ffffff',
+      readColor: '#d495d4',
+      fontSize: 22,
+      currentTextFontSize: 22,
+      textSpeed: 25,
+      screenAlwaysOn: true,
+      boldText: false,
+      skipOnlyRead: false,
+      autoPlayDelay: 2000,
+      pageShow: true,
+      viewed: false,
+      readProgress: 1,
+      saveSlots: [
+        { id: 1, text: '空', progress: 1 },
+        { id: 2, text: '空', progress: 1 },
+        { id: 3, text: '空', progress: 1 },
+        { id: 4, text: '空', progress: 1 },
+        { id: 5, text: '空', progress: 1 }
+      ],
+      maxSaveSlots: 100,
+      loadShow: false,
+      saveShow: false,
+      contrlcenterShow: false,
+      currentBackground: '/common/bcgi/神社_境内a.jpg',
+      nextBackground: '',
+      showNextBackground: false,
+      characterimg: '',
+      cgimg: '',
+      nextCg: '',
+      showNextCg: false,
+      nextCharacterImg: '',
+      showNextCharacter: false,
+      currentBackgroundScaleClass: 'bg-scale-1',
+      currentCharacterScaleClass: 'character-scale-1',
+      nextBackgroundScaleClass: '',
+      nextCharacterScaleClass: '',
+      character: ' ',
+      displayCharacter: ' ',
+      contect: '',
+      displayText: '......加载中......',
+      gameEngine: null,
+      isAutoing: false,
+      isTyping: false,
+      typewriterTimer: null,
+      currentTextIndex: 0,
+      autoPlayTimer: null,
+      choose1: '选项一',
+      choose2: '选项二',
+      choose3: '选项三',
+      choose4: '选项四',
+      choose5: '选项五',
+      choose1Visible: true,
+      choose2Visible: true,
+      choose3Visible: true,
+      choose4Visible: true,
+      choose5Visible: true,
+      choose1To: 1,
+      choose2To: 1,
+      choose3To: 1,
+      choose4To: 1,
+      choose5To: 1,
+      choose: false,
+      nowTime: '00:00',
+      timeTimer: null,
+      isGoing: false,
+      isBacking: false,
+      goTimer: null,
+      backTimer: null,
+      quickSpeed: 50,
+      isAnimating: false,
+      hideText: false,
+      maskColor: 'rgba(0, 0, 0, 0.0)',
+      animationTimer: null,
+      animationStep: 0,
+      animatingProgressId: null,
+      readBlocks: {},
+      currentBlockIndex: 0,
+      blockSize: 500,
+      preloadDistance: 10,
+      isBlockLoading: false,
+      blockLoadingQueue: [],
+      pendingSaves: {},
+      saveThreshold: 10,
+      branchConfig: {
+        noBackPages: {
+          115: '109', 124: '124', 3472: '3468', 3480: '3480', 5508: '5504', 5511: '5511',
+          6131: '5912', 6282: '5912', 6030: '5926', 6322: '6322', 6325: '6325', 6394: '6390',
+          6505: '6505', 7341: '7337', 7344: '7344', 8424: '8418', 8427: '8427', 15999: '15980',
+          16013: '16013', 16950: '16931', 16969: '16969', 17185: '17184', 17189: '17189',
+          17836: '17806', 17862: '17862', 18004: '17999', 18008: '18008', 18083: '18064',
+          18094: '18094', 18759: '18743', 18773: '18773', 18967: '18950', 18978: '18978',
+          24620: '24608', 24630: '24630', 25633: '25620', 25644: '25644', 27111: '27092',
+          27129: '27129', 27425: '27410', 27436: '27436', 27938: '27920', 27951: '27951',
+          28113: '28101', 28124: '28124', 32531: '32525', 32539: '32539', 33997: '33978',
+          34011: '34011', 34182: '34167', 34201: '34201', 37993: '37983', 38003: '38003',
+          38880: '38866', 38889: '38889', 39049: '39024', 39071: '39071', 44705: '44683',
+          44728: '44728', 44887: '44863', 44910: '44910', 45998: '45969', 45999: '45999',
+          47089: '47064', 47090: '47090', 47224: '47204', 47226: '47226', 48414: '48390',
+          48417: '48417', 48580: '48556', 48584: '48584', 52466: '52420', 52470: '52470',
+          52871: '52851', 52875: '52875', 53416: '53398', 53420: '53420', 53904: '53888',
+          53908: '53908', 54648: '54629', 54652: '54652', 54879: '54867', 54883: '54883',
+          55341: '55340', 55344: '55344', 55867: '55849', 55871: '55871', 31160: '8460',
+          9182: '9130', 19002: '9130', 28137: '9165', 48623: '9165', 51377: '51369',
+          51559: '51376', 51769: '51769', 51889: '51814', 51976: '51888', 53926: '51975',
+          7978: '7978'
+        },
+        noNextPages: {
+          114: '124', 123: '124', 3471: '3480', 3479: '3480', 5507: '5511', 5510: '5511',
+          5925: '6325', 6281: '6325', 6321: '6325', 6029: '6322', 6130: '6322', 6393: '6505',
+          6411: '6505', 7340: '7344', 7343: '7344', 8423: '8427', 8426: '8427', 15998: '16013',
+          16012: '16013', 16949: '16969', 16968: '16969', 17188: '17189', 17835: '17862',
+          17861: '17862', 18003: '18008', 18007: '18008', 18082: '18094', 18093: '18094',
+          18758: '18773', 18772: '18773', 18966: '18978', 18977: '18978', 24619: '24630',
+          24629: '24630', 25632: '25644', 25643: '25644', 27110: '27129', 27128: '27129',
+          27424: '27436', 27435: '27436', 27937: '27951', 27950: '27951', 28112: '28124',
+          28123: '28124', 32530: '32539', 32538: '32539', 33996: '34011', 34010: '34011',
+          34181: '34201', 34200: '34201', 37992: '38003', 38002: '38003', 38879: '38889',
+          38888: '38889', 39048: '39071', 39070: '39071', 44704: '44728', 44727: '44728',
+          44886: '44910', 44909: '44910', 45970: '45999', 45998: '45999', 47065: '47090',
+          47089: '47090', 47205: '47226', 47225: '47226', 48391: '48417', 48416: '48417',
+          48558: '48584', 48583: '48584', 51888: '51976', 51975: '53926', 51369: '51377',
+          51376: '51599', 51558: '51769', 51568: '51769', 52423: '52470', 52469: '52470',
+          52854: '52875', 52874: '52875', 53401: '53420', 53419: '53420', 53891: '53908',
+          53907: '53908', 54632: '54652', 54651: '54652', 54870: '54883', 54882: '54883',
+          55343: '55344', 55852: '55871', 55870: '55871'
+        },
+        hiddenPages: {
+          6411: (choices) => choices[5912] === 3 ? 6412 : 6505,
+          7813: (choices) => choices[5912] === 2 ? 7814 : 7978,
+          8460: (choices) => choices[5504] === 1 && choices[5912] === 1 && choices[5926] === 2 ? 31160 : 8461,
+          9130: (choices) => choices[5504] === 2 && choices[5912] === 1 && choices[5926] === 1 && choices[8418] === 1 ? 9182 : (choices[5504] === 2 && choices[5912] === 2 ? 19002 : 9131),
+          9165: (choices) => choices[5504] === 3 && choices[5912] === 2 && choices[6390] === 2 ? 28137 : (choices[109] === 1 && choices[5504] === 2 && choices[7337] === 2 ? 48623 : 9166),
+          51814: (choices) => choices[51359] === 1 ? 51815 : (choices[51359] === 2 ? 51889 : undefined)
+        },
+        choices: {},
+        end: {
+          9180: 'END', 18290: 'Yoshino End', 27528: 'Mako End', 28289: 'Murasame End',
+          48182: 'Rena End', 53480: 'Koharu End', 55420: 'Roka End',
+          18999: '回到主页', 28135: '回到主页', 39158: '回到主页',
+          48621: '回到主页', 53925: '回到主页', 55901: '回到主页'
+        }
+      },
+      mainScrollStartY: 0,
+      mainTouchMovedY: 0,
+      mainScrollAtBottom: false,
+      hideOnUpThreshold: -380,
+      isLoadingScript: false,
+      isGameEngineLoaded: false,
+      currentPageId: 1,
+      choose1Color: '#ffffff',
+      choose2Color: '#ffffff',
+      choose3Color: '#ffffff',
+      choose4Color: '#ffffff',
+      choose5Color: '#ffffff',
+      quickNavigationCache: {},
+      quickCacheSize: 30,
+      quickNavigationQueue: [],
+      lastScrollTime: 0,
+      scrollThrottleDelay: 200,
+      lastSavedProgress: 1,
+      progressSaveDelay: 500,
+      progressSaveTimer: null,
+      imageCache: {},
+      maxImageCacheSize: 8,
+      currentImageKeys: [],
+      isPreloadingImages: false,
+      imageMemoryUsage: 0,
+      maxImageMemory: 0xf00000,
+      lastImageCleanup: 0,
+      imageCleanupInterval: 5000,
+      imageLoadSuccess: 0,
+      imageLoadFail: 0,
+      lowMemoryMode: false,
+      forceImageCleanupThreshold: 0.8,
+      fontParseCache: {},
+      fontParseCacheOrder: [],
+      isEnding: false,
+      endText: '',
+      endAnimationDone: false,
+      flashbangPages: [],
+      showFlashbang: false,
+      flashbangOpacity: 1,
+      flashbangTimer: null,
+      isFlashActive: false,
+      waitForFlashbang: false
+    },
+
+    parseTextFontSize(text) {
+      if (!text) return { fontSize: this.fontSize, text: '' }
+      if (this.fontParseCache[text]) return this.fontParseCache[text]
+      let fontSize = this.fontSize
+      let displayText = text
+      let match = text.match(/^%(\d+)\s*(.*)/)
+      if (match) {
+        let percent = parseInt(match[1])
+        fontSize = Math.max(10, Math.min(100, Math.floor(this.fontSize * percent / 100)))
+        displayText = match[2]
+      }
+      let result = { fontSize: fontSize, text: displayText }
+      if (this.fontParseCacheOrder.length > 200) {
+        let oldest = this.fontParseCacheOrder.shift()
+        delete this.fontParseCache[oldest]
+      }
+      this.fontParseCache[text] = result
+      this.fontParseCacheOrder.push(text)
+      return result
+    },
+
+    getCharacterScaleClass(z) {
+      if (z === 1) return 'character-scale-07'
+      if (z === 2) return 'character-scale-12'
+      return 'character-scale-1'
+    },
+
+    getBackgroundScaleClass(z) {
+      return z === 2 ? 'bg-scale-11' : 'bg-scale-1'
+    },
+
+    updateImageIfNeeded(prop, newUrl, type) {
+      if (this[prop] === newUrl) return false
+      this[prop] = newUrl
+      if (newUrl) this.addToImageCache(newUrl, type)
+      return true
+    },
+
+    getImageKey(url) {
+      if (!url) return null
+      let key = url.split('?')[0]
+      return key.split('/').pop() || key
+    },
+
+    estimateImageSize(url) {
+      if (!url) return 0
+      let isPng = url.includes('.png')
+      let isJpg = url.includes('.jpg') || url.includes('.jpeg')
+      if (isPng) return 51200
+      if (isJpg) return url.includes('bcgi') ? 30720 : (url.includes('evig') ? 40960 : 20480)
+      return 30720
+    },
+
+    addToImageCache(url, type = 'unknown', isPreload = false) {
+      if (!url) return false
+      let key = this.getImageKey(url)
+      if (!key) return false
+      if (this.imageCache[key]) {
+        this.imageCache[key].lastUsed = Date.now()
+        this.imageCache[key].isPreload = isPreload
+        return true
+      }
+      let size = this.estimateImageSize(url)
+      if (this.imageMemoryUsage + size > this.maxImageMemory * 0.9) {
+        this.cleanupImagesByPriority(2)
+      }
+      this.imageCache[key] = {
+        url: url, loaded: false, lastUsed: Date.now(), size: size,
+        type: type, isPreload: isPreload, priority: this.getImagePriority(type, isPreload)
+      }
+      this.imageMemoryUsage += size
+      return true
+    },
+
+    getImagePriority(type, isPreload) {
+      if (isPreload) return 1
+      switch (type) {
+        case 'background': return 10
+        case 'cg': return 8
+        case 'character': return 6
+        default: return 3
+      }
+    },
+
+    markImageAsUsed(url, type) {
+      if (!url) return
+      let key = this.getImageKey(url)
+      if (!key || !this.imageCache[key]) return
+      this.imageCache[key].lastUsed = Date.now()
+      this.imageCache[key].priority = this.getImagePriority(type, false)
+      this.imageCache[key].isPreload = false
+      this.addToCurrentImageList(key)
+      if (this.currentImageKeys.length > 4) {
+        let removed = this.currentImageKeys.shift()
+        if (removed && this.imageCache[removed]) {
+          this.imageCache[removed].priority = Math.max(1, this.imageCache[removed].priority - 2)
+        }
+      }
+    },
+
+    addToCurrentImageList(key) {
+      let idx = this.currentImageKeys.indexOf(key)
+      if (idx !== -1) this.currentImageKeys.splice(idx, 1)
+      this.currentImageKeys.push(key)
+    },
+
+    cleanupImagesByPriority(count = 1) {
+      let now = Date.now()
+      if (now - this.lastImageCleanup < this.imageCleanupInterval) return
+      this.lastImageCleanup = now
+      let candidates = Object.entries(this.imageCache).filter(([k, v]) =>
+        !this.currentImageKeys.includes(k) && now - v.lastUsed > 5000
+      )
+      if (candidates.length === 0) return
+      candidates.sort((a, b) =>
+        a[1].priority !== b[1].priority ? a[1].priority - b[1].priority : a[1].lastUsed - b[1].lastUsed
+      )
+      let toRemove = candidates.slice(0, Math.min(count, candidates.length))
+      let freed = 0
+      toRemove.forEach(([k, v]) => {
+        freed += v.size || 0
+        delete this.imageCache[k]
+      })
+      this.imageMemoryUsage = Math.max(0, this.imageMemoryUsage - freed)
+      if (this.imageMemoryUsage > this.maxImageMemory * this.forceImageCleanupThreshold) {
+        this.forceCleanupExcessImages()
+      }
+    },
+
+    forceCleanupExcessImages() {
+      let excess = this.imageMemoryUsage - 0.8 * this.maxImageMemory
+      if (excess <= 0) return
+      let freed = 0
+      for (let [k, v] of Object.entries(this.imageCache)
+        .filter(([k]) => !this.currentImageKeys.includes(k))
+        .sort((a, b) => 1000 * a[1].priority + a[1].lastUsed - (1000 * b[1].priority + b[1].lastUsed))) {
+        if (freed >= excess) break
+        freed += v.size || 0
+        delete this.imageCache[k]
+      }
+      this.imageMemoryUsage = Math.max(0, this.imageMemoryUsage - freed)
+      if (freed > 0) this.lowMemoryMode = true
+    },
+
+    async smartPreloadImages(script, progressId) {
+      if (!script || !this.gameEngine || this.imageMemoryUsage > this.maxImageMemory * 0.7) return
+      let preloadItems = []
+      if (script.background) preloadItems.push({ url: script.background, type: 'background' })
+      if (script.cg) preloadItems.push({ url: script.cg, type: 'cg' })
+      if (script.character) preloadItems.push({ url: script.character, type: 'character' })
+      preloadItems.forEach(item => this.addToImageCache(item.url, item.type, true))
+      if (this.isPreloadingImages || this.lowMemoryMode) return
+      this.isPreloadingImages = true
+      setTimeout(async () => {
+        try {
+          for (let i = 1; i <= 2; i++) {
+            let nextId = progressId + i
+            let nextScript = await this.gameEngine.getScript(nextId)
+            if (nextScript) {
+              if (nextScript.background && nextScript.background !== script.background) this.addToImageCache(nextScript.background, 'background', true)
+              if (nextScript.cg && nextScript.cg !== script.cg) this.addToImageCache(nextScript.cg, 'cg', true)
+              if (nextScript.character && nextScript.character !== script.character) this.addToImageCache(nextScript.character, 'character', true)
+            }
+            if (this.imageMemoryUsage > this.maxImageMemory * 0.6) break
+          }
+        } catch (e) {} finally {
+          this.isPreloadingImages = false
+        }
+      }, 300)
+    },
+
+    onImageLoad(type, url) {
+      this.imageLoadSuccess++
+      let key = this.getImageKey(url)
+      if (key && this.imageCache[key]) this.imageCache[key].loaded = true
+      this.markImageAsUsed(url, type)
+    },
+
+    onImageError(type, url) {
+      let key = this.getImageKey(url)
+      if (key && this.imageCache[key]) {
+        this.imageCache[key].failed = true
+        this.imageCache[key].priority = -1
+      }
+      switch (type) {
+        case 'background': if (this.currentBackground === url) this.currentBackground = ''; break
+        case 'nextBackground': if (this.nextBackground === url) { this.nextBackground = ''; this.showNextBackground = false } break
+        case 'cg': if (this.cgimg === url) this.cgimg = ''; break
+        case 'nextCg': if (this.nextCg === url) { this.nextCg = ''; this.showNextCg = false } break
+        case 'character': if (this.characterimg === url) this.characterimg = ''; break
+        case 'nextCharacter': if (this.nextCharacterImg === url) { this.nextCharacterImg = ''; this.showNextCharacter = false } break
+      }
+    },
+
+    getImageCacheStatus() {
+      let total = Object.keys(this.imageCache).length
+      return {
+        total: total,
+        loaded: Object.values(this.imageCache).filter(v => v.loaded).length,
+        preload: Object.values(this.imageCache).filter(v => v.isPreload).length,
+        current: this.currentImageKeys.length,
+        memory: `${Math.round(this.imageMemoryUsage / 1024)}KB/${Math.round(this.maxImageMemory / 1024)}KB`,
+        usage: Math.round(this.imageMemoryUsage / this.maxImageMemory * 100),
+        success: this.imageLoadSuccess,
+        fail: this.imageLoadFail
+      }
+    },
+
+    cleanupFlashbang() {
+      if (this.flashbangTimer) { clearTimeout(this.flashbangTimer); this.flashbangTimer = null }
+      if (this.showFlashbang) this.showFlashbang = false
+      this.isFlashActive = false
+      if (this.waitForFlashbang) this.startTypewriterAfterFlashbang()
+    },
+
+    startTypewriterAfterFlashbang() {
+      if (!this.waitForFlashbang) return
+      this.waitForFlashbang = false
+      this.displayCharacter = this.character
+      this.displayText = ''
+      this.currentTextIndex = 0
+      this.startTypewriter()
+    },
+
+    triggerFlashbang() {
+      if (this.isFlashActive) this.cleanupFlashbang()
+      if (this.isEnding || this.isAnimating) return
+      this.isFlashActive = true
+      this.showFlashbang = true
+      this.flashbangOpacity = 1
+      let opacity = 1
+      if (this.flashbangTimer) clearTimeout(this.flashbangTimer)
+      this.flashbangTimer = setInterval(() => {
+        opacity -= 0.05
+        if (opacity <= 0) {
+          clearInterval(this.flashbangTimer)
+          this.flashbangTimer = null
+          this.cleanupFlashbang()
+        } else {
+          this.flashbangOpacity = opacity
+        }
+      }, 20)
+    },
+
+    getBlockIndex(id) { return Math.floor((id - 1) / this.blockSize) },
+    getBlockOffset(id) { return (id - 1) % this.blockSize },
+    shouldSaveBlock(blockIndex, offset) { return offset <= this.saveThreshold || offset >= this.blockSize - this.saveThreshold },
+
+    async loadBlock(blockIndex) {
+      if (this.readBlocks[blockIndex]) return true
+      return new Promise((resolve) => {
+        storage.get({
+          key: `readBlock_${blockIndex}`,
+          success: (data) => {
+            try {
+              if (data) {
+                this.readBlocks[blockIndex] = JSON.parse(data)
+              } else {
+                this.readBlocks[blockIndex] = Array(this.blockSize).fill(false)
+              }
+              resolve(true)
+            } catch (e) {
+              this.readBlocks[blockIndex] = Array(this.blockSize).fill(false)
+              resolve(true)
+            }
+          },
+          fail: () => {
+            this.readBlocks[blockIndex] = Array(this.blockSize).fill(false)
+            resolve(true)
+          }
+        })
+      })
+    },
+
+    markBlockForSave(blockIndex) {
+      if (!this.readBlocks[blockIndex]) return
+      this.pendingSaves[blockIndex] = [...this.readBlocks[blockIndex]]
+    },
+
+    async savePendingBlocks() {
+      let keys = Object.keys(this.pendingSaves)
+      if (keys.length === 0) return
+      let promises = []
+      for (let key of keys) {
+        let storageKey = `readBlock_${key}`
+        let data = this.pendingSaves[key]
+        let p = new Promise((resolve) => {
+          storage.set({
+            key: storageKey,
+            value: JSON.stringify(data),
+            success: () => { delete this.pendingSaves[key]; resolve(true) },
+            fail: () => resolve(false)
+          })
+        })
+        promises.push(p)
+      }
+      await Promise.all(promises)
+    },
+
+    async saveOnBlockTransition(id) {
+      let newBlock = this.getBlockIndex(id)
+      let oldBlock = this.currentBlockIndex
+      if (newBlock !== oldBlock && this.readBlocks[oldBlock]) {
+        this.markBlockForSave(oldBlock)
+        await this.savePendingBlocks()
+      }
+      this.currentBlockIndex = newBlock
+    },
+
+    async preloadAdjacentBlocks(id) {
+      let blockIndex = this.getBlockIndex(id)
+      let offset = this.getBlockOffset(id)
+      if (offset >= this.blockSize - this.preloadDistance) {
+        let next = blockIndex + 1
+        if (!this.readBlocks[next]) this.loadBlock(next)
+      }
+      if (offset <= this.preloadDistance && blockIndex > 0) {
+        let prev = blockIndex - 1
+        if (!this.readBlocks[prev]) this.loadBlock(prev)
+      }
+    },
+
+    smartCleanBlocks(id) {
+      let current = this.getBlockIndex(id)
+      let keep = [current, current - 1, current + 1]
+      Object.keys(this.readBlocks).forEach((key) => {
+        let idx = parseInt(key)
+        if (!keep.includes(idx)) delete this.readBlocks[idx]
+      })
+    },
+
+    async markPageAsRead(id) {
+      if (!id) return
+      let blockIndex = this.getBlockIndex(id)
+      let offset = this.getBlockOffset(id)
+      if (!this.readBlocks[blockIndex]) await this.loadBlock(blockIndex)
+      if (this.readBlocks[blockIndex] && this.readBlocks[blockIndex][offset] !== true) {
+        this.readBlocks[blockIndex][offset] = true
+        if (this.shouldSaveBlock(blockIndex, offset)) this.markBlockForSave(blockIndex)
+        this.preloadAdjacentBlocks(id)
+        if (offset >= this.preloadDistance && offset <= this.blockSize - this.preloadDistance) {
+          this.smartCleanBlocks(id)
+        }
+      }
+    },
+
+    async isPageRead(id) {
+      if (!id) return false
+      let blockIndex = this.getBlockIndex(id)
+      let offset = this.getBlockOffset(id)
+      if (this.readBlocks[blockIndex]) return this.readBlocks[blockIndex][offset] === true
+      await this.loadBlock(blockIndex)
+      return this.readBlocks[blockIndex] && this.readBlocks[blockIndex][offset] === true
+    },
+
+    async loadReadPages() {
+      return new Promise((resolve) => {
+        let blockIndex = this.getBlockIndex(this.readProgress)
+        this.currentBlockIndex = blockIndex
+        let blocks = [blockIndex]
+        if (blockIndex > 0) blocks.push(blockIndex - 1)
+        Promise.all(blocks.map(b => this.loadBlock(b))).then(() => resolve()).catch(() => resolve())
+      })
+    },
+
+    setKeepScreenOn(on) {
+      try { brightness.setKeepScreenOn({ keepScreenOn: on }) } catch (e) { console.warn('屏幕常亮设置失败（不影响游戏）:', e) }
+    },
+
+    updateTime() {
+      let now = new Date()
+      let h = now.getHours()
+      let m = now.getMinutes()
+      h = h < 10 ? '0' + h : h
+      m = m < 10 ? '0' + m : m
+      this.nowTime = `${h}:${m}`
+    },
+
+    checkSpecialJump(id, direction) {
+      if (direction === 'next' && this.branchConfig.noNextPages[id]) return this.branchConfig.noNextPages[id]
+      if (direction === 'back' && this.branchConfig.noBackPages[id]) return this.branchConfig.noBackPages[id]
+      return null
+    },
+
+    checkHiddenPage(id) {
+      let key = id.toString()
+      if (this.branchConfig.hiddenPages && this.branchConfig.hiddenPages[key]) {
+        let fn = this.branchConfig.hiddenPages[key]
+        try {
+          let result = fn(this.branchConfig.choices || {})
+          let num = Number(result)
+          return Number.isFinite(num) && !Number.isNaN(num) ? num : id
+        } catch (e) {}
+      }
+      return id
+    },
+
+    checkEndPage(id) {
+      return this.branchConfig.end[id] || null
+    },
+
+    recordChoice(id, choice) {
+      this.branchConfig.choices[id] = choice
+      storage.set({ key: 'branchChoices', value: JSON.stringify(this.branchConfig.choices) })
+    },
+
+    debouncedSaveProgress() {
+      if (this.progressSaveTimer) clearTimeout(this.progressSaveTimer)
+      this.progressSaveTimer = setTimeout(() => { this.saveProgressToStorage() }, this.progressSaveDelay)
+    },
+
+    startBackgroundAnimation(newBg, newCg, newChar, speaker, text, progressId, charScale, bgScale, fontSize) {
+      if (this.isAnimating) this.finishAnimation()
+      this.isAnimating = true
+      this.animationStep = 0
+      this.nextBackground = newBg
+      this.nextCg = newCg
+      this.nextCharacterImg = newChar
+      this.nextCharacterScaleClass = charScale
+      this.nextBackgroundScaleClass = bgScale
+      if (newBg) this.addToImageCache(newBg, 'background')
+      if (newCg) this.addToImageCache(newCg, 'cg')
+      if (newChar) this.addToImageCache(newChar, 'character')
+      this.character = speaker
+      this.contect = text
+      this.animatingProgressId = progressId
+      this.currentTextFontSize = fontSize
+      this.playAnimation()
+    },
+
+    playAnimation() {
+      if (!this.isAnimating) return
+      if (this.animationTimer) clearTimeout(this.animationTimer)
+      if (this.animationStep <= 10) {
+        let opacity = (0.1 * this.animationStep).toFixed(2)
+        this.maskColor = `rgba(0, 0, 0, ${opacity})`
+        this.hideText = true
+        if (this.animationStep === 10) {
+          if (this.nextBackground) this.showNextBackground = true
+          if (this.nextCg) this.showNextCg = true
+          if (this.nextCharacterImg) this.showNextCharacter = true
+          this.characterimg = ''
+          this.cgimg = ''
+          this.displayCharacter = this.character
+          this.displayText = ''
+          this.cleanupImagesByPriority(1)
+        }
+        this.animationStep++
+      } else if (this.animationStep <= 20) {
+        let opacity = ((20 - this.animationStep) * 0.1).toFixed(2)
+        this.maskColor = `rgba(0, 0, 0, ${opacity})`
+        if (this.animationStep === 20) {
+          if (this.nextBackground) {
+            this.currentBackground = this.nextBackground
+            this.currentBackgroundScaleClass = this.nextBackgroundScaleClass
+            this.showNextBackground = false
+          }
+          if (this.nextCg) { this.cgimg = this.nextCg }
+          this.showNextCg = false
+          if (this.nextCharacterImg) {
+            this.characterimg = this.nextCharacterImg
+            this.currentCharacterScaleClass = this.nextCharacterScaleClass
+          }
+          this.showNextCharacter = false
+          this.hideText = false
+        }
+        this.animationStep++
+      } else {
+        this.finishAnimation()
+        return
+      }
+      this.animationTimer = setTimeout(() => this.playAnimation(), 30)
+    },
+
+    finishAnimation() {
+      this.isAnimating = false
+      this.hideText = false
+      this.maskColor = 'rgba(0, 0, 0, 0.0)'
+      this.showNextBackground = false
+      this.showNextCg = false
+      this.showNextCharacter = false
+      this.nextCg = ''
+      this.nextCharacterImg = ''
+      this.nextCharacterScaleClass = ''
+      this.nextBackgroundScaleClass = ''
+      if (this.isEnding) {
+        this.endAnimationDone = true
+      } else {
+        if (this.animatingProgressId) {
+          this.isPageRead(this.animatingProgressId).then(r => this.viewed = r).catch(() => this.viewed = false)
+          this.animatingProgressId = null
+        }
+        if (this.waitForFlashbang) {
+          this.displayCharacter = ''
+          this.displayText = ''
+        } else {
+          this.startTypewriter()
+        }
+      }
+    },
+
+    quickgo() {
+      if (this.isGoing) this.stopQuickGo()
+      else this.startQuickGo()
+      this.contrlcenterShow = false
+    },
+
+    startQuickGo() {
+      this.toTop()
+      this.stopAutoplay()
+      this.stopQuickBack()
+      this.isGoing = true
+      this.quickNavigationCache = {}
+      this.quickNavigationQueue = []
+      this.quickSpeed = 50
+      this.scheduleNextQuickPage()
+    },
+
+    stopQuickGo() {
+      this.isGoing = false
+      if (this.goTimer) clearTimeout(this.goTimer)
+    },
+
+    scheduleNextQuickPage() {
+      if (!this.isGoing) return
+      if (this.goTimer) clearTimeout(this.goTimer)
+      this.goTimer = setTimeout(() => { if (this.isGoing) this.nextQuickPage() }, this.quickSpeed)
+    },
+
+    async nextQuickPage() {
+      if (this.isTyping) {
+        if (this.skipOnlyRead && !(await this.isPageRead(this.readProgress))) {
+          this.stopQuickGo(); return
+        }
+        this.skipTyping()
+      }
+      if (!this.skipOnlyRead) await this.markPageAsRead(this.readProgress)
+      let end = this.checkEndPage(this.readProgress)
+      if (end) { this.triggerEndSequence(end); return }
+      let hidden = this.checkHiddenPage(this.readProgress)
+      if (hidden !== this.readProgress) {
+        this.readProgress = hidden
+        await this.saveOnBlockTransition(this.readProgress)
+        await this.loadQuickPage(this.readProgress)
+        this.scheduleNextQuickPage(); return
+      }
+      let special = this.checkSpecialJump(this.readProgress, 'next')
+      if (special != null) {
+        this.readProgress = special
+        await this.saveOnBlockTransition(this.readProgress)
+        await this.loadQuickPage(this.readProgress)
+        this.scheduleNextQuickPage(); return
+      }
+      if (this.choose) { this.stopQuickGo(); return }
+      this.readProgress++
+      if (this.skipOnlyRead && !(await this.isPageRead(this.readProgress))) {
+        this.stopQuickGo(); return
+      }
+      await this.saveOnBlockTransition(this.readProgress)
+      await this.loadQuickPage(this.readProgress)
+      this.scheduleNextQuickPage()
+    },
+
+    quickback() {
+      if (this.isBacking) this.stopQuickBack()
+      else this.startQuickBack()
+      this.contrlcenterShow = false
+    },
+
+    startQuickBack() {
+      this.toTop()
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.isBacking = true
+      this.quickNavigationCache = {}
+      this.quickNavigationQueue = []
+      this.quickSpeed = 50
+      this.scheduleLastQuickPage()
+    },
+
+    stopQuickBack() {
+      this.isBacking = false
+      if (this.backTimer) clearTimeout(this.backTimer)
+    },
+
+    scheduleLastQuickPage() {
+      if (!this.isBacking) return
+      if (this.backTimer) clearTimeout(this.backTimer)
+      this.backTimer = setTimeout(() => { if (this.isBacking) this.lastQuickPage() }, this.quickSpeed)
+    },
+
+    async lastQuickPage() {
+      let special = this.checkSpecialJump(this.readProgress, 'back')
+      if (special != null) {
+        if (special !== this.readProgress) this.readProgress = special
+        await this.saveOnBlockTransition(this.readProgress)
+        await this.loadQuickPage(this.readProgress)
+        this.scheduleLastQuickPage(); return
+      }
+      if (this.readProgress > 1) {
+        this.readProgress--
+        await this.saveOnBlockTransition(this.readProgress)
+        await this.loadQuickPage(this.readProgress)
+        this.scheduleLastQuickPage()
+      } else {
+        this.stopQuickBack()
+      }
+    },
+
+    async loadQuickPage(id) {
+      if (this.isLoadingScript) return
+      this.isLoadingScript = true
+      try {
+        if (this.quickNavigationCache[id]) {
+          this.applyQuickPageScript(this.quickNavigationCache[id], id)
+          this.isLoadingScript = false; return
+        }
+        let end = this.checkEndPage(id)
+        if (end) { this.triggerEndSequence(end); this.isLoadingScript = false; return }
+        if (!this.gameEngine || !this.isGameEngineLoaded) {
+          this.gameEngine = new GameScriptLoader()
+          let loaded = await this.gameEngine.loadGameScript()
+          this.isGameEngineLoaded = loaded
+          if (!loaded) { this.displayText = '脚本加载失败，请重新启动应用'; this.isLoadingScript = false; return }
+        }
+        let script = await this.gameEngine.getScript(id)
+        if (script) {
+          this.cachePageScript(id, script)
+          this.applyQuickPageScript(script, id)
+        } else {
+          this.contect = '加载失败，请检查脚本文件'
+          this.displayText = this.contect
+        }
+      } catch (e) {
+        this.contect = '加载页面失败'
+        this.displayText = this.contect
+      } finally {
+        this.isLoadingScript = false
+      }
+    },
+
+    cachePageScript(id, script) {
+      if (Object.keys(this.quickNavigationCache).length >= this.quickCacheSize) {
+        let oldest = this.quickNavigationQueue.shift()
+        if (oldest) delete this.quickNavigationCache[oldest]
+      }
+      this.quickNavigationCache[id] = script
+      let idx = this.quickNavigationQueue.indexOf(id)
+      if (idx > -1) this.quickNavigationQueue.splice(idx, 1)
+      this.quickNavigationQueue.push(id)
+    },
+
+    applyQuickPageScript(script, id) {
+      let charScale = this.getCharacterScaleClass(script.z)
+      let bgScale = this.getBackgroundScaleClass(script.z)
+      this.updateImageIfNeeded('currentBackground', script.background || '', 'background')
+      this.currentBackgroundScaleClass = bgScale
+      this.updateImageIfNeeded('cgimg', script.cg || '', 'cg')
+      this.updateImageIfNeeded('characterimg', script.character || '', 'character')
+      this.currentCharacterScaleClass = charScale
+      this.character = script.speaker || ''
+      let parsed = this.parseTextFontSize(script.text || '')
+      this.contect = parsed.text
+      this.currentTextFontSize = parsed.fontSize
+      this.setChoiceData(script, id)
+      this.isPageRead(id).then(r => this.viewed = r).catch(() => this.viewed = false)
+      this.displayCharacter = this.character
+      this.displayText = this.contect
+      this.isTyping = false
+      this.currentPageId = id
+      if (this.choose) {
+        this.stopQuickGo()
+        this.stopQuickBack()
+      }
+    },
+
+    async choose1c() {
+      await this.markPageAsRead(this.readProgress)
+      this.recordChoice(this.readProgress, 1)
+      this.setChooseColors(this.readProgress)
+      this.readProgress = this.choose1To
+      await this.saveOnBlockTransition(this.readProgress)
+      this.loadPage(this.readProgress)
+    },
+    async choose2c() {
+      await this.markPageAsRead(this.readProgress)
+      this.recordChoice(this.readProgress, 2)
+      this.setChooseColors(this.readProgress)
+      this.readProgress = this.choose2To
+      await this.saveOnBlockTransition(this.readProgress)
+      this.loadPage(this.readProgress)
+    },
+    async choose3c() {
+      await this.markPageAsRead(this.readProgress)
+      this.recordChoice(this.readProgress, 3)
+      this.setChooseColors(this.readProgress)
+      this.readProgress = this.choose3To
+      await this.saveOnBlockTransition(this.readProgress)
+      this.loadPage(this.readProgress)
+    },
+    async choose4c() {
+      await this.markPageAsRead(this.readProgress)
+      this.recordChoice(this.readProgress, 4)
+      this.setChooseColors(this.readProgress)
+      this.readProgress = this.choose4To
+      await this.saveOnBlockTransition(this.readProgress)
+      this.loadPage(this.readProgress)
+    },
+    async choose5c() {
+      await this.markPageAsRead(this.readProgress)
+      this.recordChoice(this.readProgress, 5)
+      this.setChooseColors(this.readProgress)
+      this.readProgress = this.choose5To
+      await this.saveOnBlockTransition(this.readProgress)
+      this.loadPage(this.readProgress)
+    },
+
+    autoplay() {
+      if (this.isAutoing) this.stopAutoplay()
+      else this.startAutoplay()
+      this.contrlcenterShow = false
+    },
+
+    startAutoplay() {
+      this.stopQuickGo()
+      this.stopQuickBack()
+      this.isAutoing = true
+      if (!this.isTyping) this.scheduleNextPage()
+    },
+
+    stopAutoplay() {
+      this.isAutoing = false
+      if (this.autoPlayTimer) clearTimeout(this.autoPlayTimer)
+    },
+
+    scheduleNextPage() {
+      if (!this.isAutoing) return
+      if (this.autoPlayTimer) clearTimeout(this.autoPlayTimer)
+      this.autoPlayTimer = setTimeout(() => { if (this.isAutoing) this.nextPage() }, this.autoPlayDelay)
+    },
+
+    onInit() {
+      this.gameEngine = new GameScriptLoader()
+      this.updateTime()
+      this.timeTimer = setInterval(() => this.updateTime(), 500)
+      setInterval(() => {
+        if (this.imageMemoryUsage > this.maxImageMemory * 0.7) this.cleanupImagesByPriority(2)
+      }, 5000)
+      this.currentBackgroundScaleClass = 'bg-scale-1'
+      this.currentCharacterScaleClass = 'character-scale-1'
+    },
+
+    onHide() {
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      if (this.typewriterTimer) clearTimeout(this.typewriterTimer)
+      if (this.animationTimer) clearTimeout(this.animationTimer)
+      if (this.progressSaveTimer) clearTimeout(this.progressSaveTimer)
+      this.cleanupFlashbang()
+      if (this.readProgress && this.readProgress > 0) {
+        try { storage.set({ key: 'readProgress', value: this.readProgress.toString() }) } catch (e) {}
+      }
+      if (Object.keys(this.pendingSaves).length > 0) this.savePendingBlocks()
+      if (this.gameEngine && this.isGameEngineLoaded) {
+        try { storage.set({ key: 'branchChoices', value: JSON.stringify(this.branchConfig.choices || {}) }) } catch (e) {}
+      }
+      this.cleanupImagesByPriority(3)
+    },
+
+    onDestroy() {
+      if (this.typewriterTimer) clearTimeout(this.typewriterTimer)
+      if (this.autoPlayTimer) clearTimeout(this.autoPlayTimer)
+      if (this.timeTimer) clearInterval(this.timeTimer)
+      if (this.goTimer) clearTimeout(this.goTimer)
+      if (this.backTimer) clearTimeout(this.backTimer)
+      if (this.animationTimer) clearTimeout(this.animationTimer)
+      if (this.progressSaveTimer) clearTimeout(this.progressSaveTimer)
+      this.cleanupFlashbang()
+      if (Object.keys(this.pendingSaves).length > 0) this.savePendingBlocks()
+      this.readBlocks = {}
+      this.currentBlockIndex = 0
+      this.pendingSaves = {}
+      this.quickNavigationCache = {}
+      this.quickNavigationQueue = []
+      this.imageCache = {}
+      this.currentImageKeys = []
+      this.imageMemoryUsage = 0
+      this.lowMemoryMode = false
+      this.fontParseCache = {}
+      this.fontParseCacheOrder = []
+      if (this.gameEngine) this.gameEngine.clearAll()
+    },
+
+    async onShow() {
+      try {
+        await this.loadAllSettings()
+        await this.loadReadPages()
+        await this.loadChoiceRecords()
+        let progress = await this.getReadProgress()
+        this.readProgress = progress
+        this.currentPageId = progress
+        this.lastSavedProgress = progress
+        await this.loadSaveSlots()
+        if (!this.gameEngine) this.gameEngine = new GameScriptLoader()
+        if (!this.isGameEngineLoaded) {
+          let loaded = await this.gameEngine.loadGameScript()
+          this.isGameEngineLoaded = loaded
+          if (!loaded) this.displayText = '脚本加载失败'
+        }
+        if (this.isGameEngineLoaded) this.loadPage(this.readProgress)
+        this.viewed = await this.isPageRead(this.readProgress)
+      } catch (e) {
+        console.error('onShow执行出错:', e)
+      }
+      this.setKeepScreenOn(this.screenAlwaysOn)
+    },
+
+    async loadAllSettings() {
+      return new Promise((resolve) => {
+        let settings = [
+          { key: 'textSpeedSetting', prop: 'textSpeed', type: 'number' },
+          { key: 'fontSizeSetting', prop: 'fontSize', type: 'number' },
+          { key: 'unreadColorSetting', prop: 'unreadColor', type: 'string' },
+          { key: 'readColorSetting', prop: 'readColor', type: 'string' },
+          { key: 'screenAlwaysOnSetting', prop: 'screenAlwaysOn', type: 'boolean' },
+          { key: 'boldTextSetting', prop: 'boldText', type: 'boolean' },
+          { key: 'skipOnlyReadSetting', prop: 'skipOnlyRead', type: 'boolean' },
+          { key: 'autoPlayDelaySetting', prop: 'autoPlayDelay', type: 'number' }
+        ]
+        let count = 0
+        settings.forEach(({ key, prop, type }) => {
+          storage.get({
+            key: key,
+            success: (data) => {
+              if (data != null) {
+                if (type === 'number') this[prop] = Number(data)
+                else if (type === 'boolean') this[prop] = data === 'true'
+                else this[prop] = data
+              }
+              if (++count === settings.length) resolve()
+            },
+            fail: () => { if (++count === settings.length) resolve() }
+          })
+        })
+      })
+    },
+
+    async loadSaveSlots() {
+      try {
+        let slots = await new Promise((resolve) => {
+          storage.get({
+            key: 'saveSlots',
+            success: (data) => { try { resolve(JSON.parse(data)) } catch (e) { resolve(null) } },
+            fail: () => resolve(null)
+          })
+        })
+        if (slots && Array.isArray(slots)) this.saveSlots = slots
+        let promises = []
+        for (let i = 0; i < this.saveSlots.length; i++) {
+          promises.push(new Promise((resolve) => {
+            storage.get({
+              key: `p${i + 1}`,
+              success: (data) => {
+                let progress = Number(data) || 1
+                this.saveSlots[i].progress = progress
+                this.saveSlots[i].text = progress === 1 ? '空' : `进度${progress}`
+                resolve(true)
+              },
+              fail: () => {
+                this.saveSlots[i].progress = 1
+                this.saveSlots[i].text = '空'
+                resolve(false)
+              }
+            })
+          }))
+        }
+        await Promise.all(promises)
+      } catch (e) {
+        console.error('加载存档时出错:', e)
+      }
+    },
+
+    saveSlotsConfig() {
+      let data = this.saveSlots.map(s => ({ id: s.id, text: s.text, progress: s.progress }))
+      storage.set({ key: 'saveSlots', value: JSON.stringify(data) })
+    },
+
+    addSaveSlot() {
+      if (this.saveSlots.length >= this.maxSaveSlots) {
+        prompt.showToast({ message: `已达到最大存档位数量(${this.maxSaveSlots})`, duration: 2000 }); return
+      }
+      let id = this.saveSlots.length + 1
+      this.saveSlots.push({ id: id, text: '空', progress: 1 })
+      this.saveSlotsConfig()
+      prompt.showToast({ message: `已添加存档位${id}`, duration: 2000 })
+    },
+
+    saveToSlot(slot) {
+      if (slot > this.saveSlots.length) {
+        prompt.showToast({ message: '存档位不存在', duration: 2000 }); return
+      }
+      let item = this.saveSlots[slot - 1]
+      storage.set({
+        key: `p${slot}`,
+        value: this.readProgress.toString(),
+        success: () => {
+          item.progress = this.readProgress
+          item.text = `进度${this.readProgress}`
+          this.saveSlots = [...this.saveSlots]
+          prompt.showToast({ message: '保存成功', duration: 2000 })
+        },
+        fail: () => prompt.showToast({ message: '保存失败', duration: 2000 })
+      })
+    },
+
+    async deleteSlot(slot) {
+      if (slot <= 0 || slot > this.saveSlots.length) {
+        prompt.showToast({ message: '存档位不存在', duration: 1000 }); return
+      }
+      let totalSlots = this.saveSlots.length
+      let allData = {}
+      for (let i = 1; i <= totalSlots; i++) {
+        allData[i] = await new Promise((resolve) => storage.get({ key: `p${i}`, success: resolve, fail: () => resolve(null) }))
+      }
+      for (let i = 1; i <= totalSlots; i++) {
+        await new Promise((resolve) => storage.delete({ key: `p${i}`, success: resolve, fail: resolve }))
+      }
+      let newIdx = 1
+      for (let i = 1; i <= totalSlots; i++) {
+        if (i !== slot && allData[i]) {
+          await new Promise((resolve) => storage.set({ key: `p${newIdx}`, value: allData[i], success: resolve, fail: resolve }))
+          newIdx++
+        }
+      }
+      this.saveSlots.splice(slot - 1, 1)
+      for (let i = 0; i < this.saveSlots.length; i++) {
+        let id = i + 1
+        this.saveSlots[i].id = id
+        await new Promise((resolve) => {
+          storage.get({
+            key: `p${id}`,
+            success: (data) => {
+              if (data) { let p = Number(data); this.saveSlots[i].progress = p; this.saveSlots[i].text = `进度${p}` }
+              else { this.saveSlots[i].progress = 1; this.saveSlots[i].text = '空' }
+              resolve()
+            },
+            fail: () => { this.saveSlots[i].progress = 1; this.saveSlots[i].text = '空'; resolve() }
+          })
+        })
+      }
+      this.saveSlots = [...this.saveSlots]
+      this.saveSlotsConfig()
+      prompt.showToast({ message: `存档位${slot}已删除`, duration: 1500 })
+    },
+
+    async reloadAllSaveSlots() {
+      let promises = []
+      for (let i = 0; i < this.saveSlots.length; i++) {
+        let p = new Promise((resolve) => {
+          let id = i + 1
+          storage.get({
+            key: `p${id}`,
+            success: (data) => {
+              if (data) { let p = Number(data); this.saveSlots[i].progress = p; this.saveSlots[i].text = `进度${p}` }
+              else { this.saveSlots[i].progress = 1; this.saveSlots[i].text = '空' }
+              resolve(true)
+            },
+            fail: () => { this.saveSlots[i].progress = 1; this.saveSlots[i].text = '空'; resolve(true) }
+          })
+        })
+        promises.push(p)
+      }
+      await Promise.all(promises)
+      this.saveSlots = [...this.saveSlots]
+      return true
+    },
+
+    quickSave() {
+      this.saveToSlot(1)
+      this.contrlcenterShow = false
+    },
+
+    loadSlot(slot) {
+      this.pageloading()
+      storage.get({
+        key: `p${slot}`,
+        success: async (data) => {
+          let progress = Number(data) || 1
+          await this.handleBlockChange(progress)
+          this.readProgress = progress
+          this.loadPage(this.readProgress)
+          this.loadShow = false
+          this.contrlcenterShow = false
+          this.stopAutoplay()
+          this.stopQuickGo()
+          this.stopQuickBack()
+        },
+        fail: () => prompt.showToast({ message: '加载失败', duration: 2000 })
+      })
+    },
+
+    loadStart(slot) {
+      this.loadSlot(slot)
+      this.contrlcenterShow = false
+    },
+
+    async handleBlockChange(newProgress) {
+      let newBlock = this.getBlockIndex(newProgress)
+      if (newBlock !== this.currentBlockIndex) {
+        if (Object.keys(this.pendingSaves).length > 0) await this.savePendingBlocks()
+        await this.loadBlock(newBlock)
+        this.currentBlockIndex = newBlock
+        this.preloadAdjacentBlocks(newProgress)
+        this.smartCleanBlocks(newProgress)
+      }
+    },
+
+    saveProgressToStorage() {
+      if (this.readProgress !== this.lastSavedProgress) {
+        this.lastSavedProgress = this.readProgress
+        storage.set({ key: 'readProgress', value: this.readProgress.toString() })
+      }
+    },
+
+    async loadPage(id) {
+      if (this.isLoadingScript) return
+      this.isLoadingScript = true
+      try {
+        this.checkEndPage(id)
+        if (!this.gameEngine || !this.isGameEngineLoaded) {
+          this.gameEngine = new GameScriptLoader()
+          let loaded = await this.gameEngine.loadGameScript()
+          this.isGameEngineLoaded = loaded
+          if (!loaded) { this.displayText = '脚本加载失败，请重新启动应用'; this.isLoadingScript = false; return }
+        }
+        let script = await this.gameEngine.getScript(id)
+        if (!script) {
+          this.contect = '加载失败，请检查脚本文件'
+          this.displayText = this.contect
+          this.displayCharacter = '系统'
+          this.isLoadingScript = false; return
+        }
+        let charScale = this.getCharacterScaleClass(script.z)
+        let bgScale = this.getBackgroundScaleClass(script.z)
+        let bg = script.background || ''
+        let speaker = script.speaker || ''
+        let text = script.text || ''
+        let cg = script.cg || ''
+        let charImg = script.character || ''
+        await this.smartPreloadImages(script, id)
+        if (bg) { this.addToImageCache(bg, 'background'); this.markImageAsUsed(bg, 'background') }
+        if (cg) { this.addToImageCache(cg, 'cg'); this.markImageAsUsed(cg, 'cg') }
+        if (charImg) { this.addToImageCache(charImg, 'character'); this.markImageAsUsed(charImg, 'character') }
+        let parsed = this.parseTextFontSize(text)
+        let displayText = parsed.text
+        let fontSize = parsed.fontSize
+        let bgChanged = bg && bg !== this.currentBackground
+        if (bgChanged) {
+          this.startBackgroundAnimation(bg, cg, charImg, speaker, displayText, id, charScale, bgScale, fontSize)
+          this.setChoiceData(script, id)
+          this.currentPageId = id
+          if (this.flashbangPages.includes(id)) {
+            this.waitForFlashbang = true
+            this.displayCharacter = ''
+            this.displayText = ''
+          }
+        } else {
+          this.updateImageIfNeeded('currentBackground', bg, 'background')
+          this.currentBackgroundScaleClass = bgScale
+          this.updateImageIfNeeded('cgimg', cg, 'cg')
+          this.updateImageIfNeeded('characterimg', charImg, 'character')
+          this.currentCharacterScaleClass = charScale
+          this.character = speaker
+          this.contect = displayText
+          this.currentTextFontSize = fontSize
+          this.setChoiceData(script, id)
+          this.displayCharacter = this.character
+          this.isPageRead(id).then(r => this.viewed = r).catch(() => this.viewed = false)
+          this.currentPageId = id
+          if (this.flashbangPages.includes(id)) {
+            this.waitForFlashbang = true
+            this.displayCharacter = ''
+            this.displayText = ''
+          } else {
+            this.startTypewriter()
+          }
+        }
+        if (!this.isEnding && this.flashbangPages.includes(id)) {
+          setTimeout(() => { this.triggerFlashbang() }, bgChanged ? 650 : 80)
+        }
+      } catch (e) {
+        console.error('加载页面失败:', e)
+        this.contect = '加载页面失败，请稍后重试'
+        this.displayText = this.contect
+        this.displayCharacter = '系统'
+      } finally {
+        this.isLoadingScript = false
+      }
+    },
+
+    setChoiceData(script, id) {
+      this.choose = script.choose || false
+      this.choose1 = script.choose1 || ''
+      this.choose2 = script.choose2 || ''
+      this.choose3 = script.choose3 || ''
+      this.choose4 = script.choose4 || ''
+      this.choose5 = script.choose5 || ''
+      this.choose1To = script.choose1To || id
+      this.choose2To = script.choose2To || id
+      this.choose3To = script.choose3To || id
+      this.choose4To = script.choose4To || id
+      this.choose5To = script.choose5To || id
+      this.choose1Visible = !!(this.choose1 || '').toString().trim()
+      this.choose2Visible = !!(this.choose2 || '').toString().trim()
+      this.choose3Visible = !!(this.choose3 || '').toString().trim()
+      this.choose4Visible = !!(this.choose4 || '').toString().trim()
+      this.choose5Visible = !!(this.choose5 || '').toString().trim()
+      this.choose = !!(this.choose && (this.choose1Visible || this.choose2Visible || this.choose3Visible || this.choose4Visible || this.choose5Visible))
+      if (this.choose) this.setChooseColors(id)
+    },
+
+    startTypewriter() {
+      if (this.typewriterTimer) clearInterval(this.typewriterTimer)
+      this.displayText = ''
+      this.currentTextIndex = 0
+      this.isTyping = true
+      this.typewriterTimer = setInterval(() => {
+        if (this.currentTextIndex < this.contect.length) {
+          this.displayText += this.contect.charAt(this.currentTextIndex)
+          this.currentTextIndex++
+          if (this.currentTextIndex % 20 === 0 || this.currentTextIndex === this.contect.length) {
+            let now = Date.now()
+            if (now - this.lastScrollTime > this.scrollThrottleDelay) {
+              this.$element('Scroll').scrollTo({ top: 9999, behavior: 'smooth' })
+              this.lastScrollTime = now
+            }
+          }
+        } else {
+          this.isTyping = false
+          clearInterval(this.typewriterTimer)
+          let now = Date.now()
+          if (now - this.lastScrollTime > this.scrollThrottleDelay) {
+            this.$element('Scroll').scrollTo({ top: 9999, behavior: 'smooth' })
+            this.lastScrollTime = now
+          }
+          if (this.isAutoing) this.scheduleNextPage()
+        }
+      }, this.textSpeed)
+    },
+
+    skipTyping() {
+      if (this.skipOnlyRead) {
+        this.isPageRead(this.readProgress).then((read) => {
+          if (read) this.completeSkipTyping()
+        }).catch(() => this.completeSkipTyping())
+      } else {
+        this.completeSkipTyping()
+      }
+    },
+
+    completeSkipTyping() {
+      if (this.typewriterTimer) clearInterval(this.typewriterTimer)
+      this.displayText = this.contect
+      this.isTyping = false
+      let now = Date.now()
+      if (now - this.lastScrollTime > this.scrollThrottleDelay) {
+        this.$element('Scroll').scrollTo({ top: 9999, behavior: 'smooth' })
+        this.lastScrollTime = now
+      }
+    },
+
+    triggerEndSequence(endText) {
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      if (this.typewriterTimer) clearInterval(this.typewriterTimer)
+      this.isTyping = false
+      this.isEnding = true
+      this.endText = endText
+      this.endAnimationDone = false
+      this.choose = false
+      this.hideText = true
+      this.pageShow = true
+      this.startBackgroundAnimation('/common/bcgi/画面_白.jpg', '', '', '', '', null, '', 'bg-scale-1', this.fontSize)
+    },
+
+    endClickReturn() {
+      this.indexRoute()
+    },
+
+    playPage() {
+      if (this.isEnding && this.endAnimationDone) return
+      if (this.isFlashActive) return
+      if (this.pageShow === false) this.pageShow = !this.pageShow
+    },
+
+    async nextPage() {
+      if (this.isTyping || this.isAnimating || this.isGoing || this.isBacking || this.isLoadingScript || this.isFlashActive) return
+      if (this.choose === true) { this.stopAutoplay(); return }
+      let end = this.checkEndPage(this.readProgress)
+      if (end) { this.triggerEndSequence(end); return }
+      if (this.branchConfig.hiddenPages[this.readProgress]) {
+        let fn = this.branchConfig.hiddenPages[this.readProgress]
+        let hidden = fn(this.branchConfig.choices)
+        if (hidden !== this.readProgress) {
+          await this.markPageAsRead(this.readProgress)
+          this.readProgress = hidden
+          await this.saveOnBlockTransition(this.readProgress)
+          this.loadPage(this.readProgress); return
+        }
+      }
+      await this.markPageAsRead(this.readProgress)
+      let special = this.checkSpecialJump(this.readProgress, 'next')
+      if (special != null) {
+        this.readProgress = special
+        await this.saveOnBlockTransition(this.readProgress)
+        this.loadPage(this.readProgress); return
+      }
+      if (!this.choose) {
+        this.readProgress++
+        await this.saveOnBlockTransition(this.readProgress)
+        this.loadPage(this.readProgress)
+      }
+    },
+
+    displayPage() {
+      if (this.isAnimating || this.isAutoing || this.isGoing || this.isBacking || this.contrlcenterShow || this.isEnding || this.isFlashActive) return
+      this.pageShow = !this.pageShow
+    },
+
+    settingsRoute() {
+      this.contrlcenterShow = false
+      this.pageloading()
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      router.push({ uri: 'pages/settings' })
+    },
+
+    lctRoute() {
+      this.contrlcenterShow = false
+      this.pageloading()
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      router.push({ uri: 'pages/lct' })
+    },
+
+    indexRoute() {
+      router.replace({ uri: 'pages/index' })
+    },
+
+    pageloading() {
+      this.currentBackground = '/common/bcgi/神社_境内a.jpg'
+      this.currentBackgroundScaleClass = 'bg-scale-1'
+      this.characterimg = ''
+      this.cgimg = ''
+      this.currentCharacterScaleClass = 'character-scale-1'
+      this.displayText = '......加载中......'
+      this.displayCharacter = ' '
+      this.currentTextFontSize = this.fontSize
+    },
+
+    toTop() {
+      this.$element('Scroll').scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+    },
+
+    hidecontrlcenter() {
+      this.contrlcenterShow = false
+    },
+
+    pageSwipe(e) {
+      if (this.isEnding || this.isFlashActive) return
+      if (e.direction === 'right' && this.readProgress > 1 && this.contrlcenterShow === false && this.pageShow === true && !this.isAnimating) {
+        let special = this.checkSpecialJump(this.readProgress, 'back')
+        if (special != null) {
+          if (special !== this.readProgress) this.readProgress = special
+        } else {
+          this.readProgress--
+        }
+        this.loadPage(this.readProgress)
+      } else if (e.direction === 'down' && !this.isAnimating) {
+        this.contrlcenterShow = true
+        this.saveProgressToStorage()
+        this.savePendingBlocks()
+      } else if (e.direction === 'up' && !this.isAnimating) {
+        this.contrlcenterShow = false
+      }
+    },
+
+    loadSaveSwipe(e) {
+      if (e.direction === 'right') {
+        if (this.loadShow) this.loadconShow()
+        else if (this.saveShow) this.saveconShow()
+      }
+    },
+
+    controlCenterSwipe(e) {
+      if (e.direction === 'right') this.hidecontrlcenter()
+    },
+
+    loadconShow() {
+      this.loadShow = !this.loadShow
+      if (this.loadShow) {
+        this.stopAutoplay()
+        this.stopQuickGo()
+        this.stopQuickBack()
+      }
+    },
+
+    saveconShow() {
+      this.saveShow = !this.saveShow
+      if (this.saveShow) {
+        this.stopAutoplay()
+        this.stopQuickGo()
+        this.stopQuickBack()
+      }
+    },
+
+    async loadChoiceRecords() {
+      return new Promise((resolve) => {
+        storage.get({
+          key: 'branchChoices',
+          success: (data) => {
+            try { this.branchConfig.choices = JSON.parse(data) } catch (e) { this.branchConfig.choices = {} }
+            resolve()
+          },
+          fail: () => { this.branchConfig.choices = {}; resolve() }
+        })
+      })
+    },
+
+    setChooseColors(id) {
+      let choice = this.branchConfig.choices[id]
+      this.choose1Color = choice === 1 ? this.readColor : this.unreadColor
+      this.choose2Color = choice === 2 ? this.readColor : this.unreadColor
+      this.choose3Color = choice === 3 ? this.readColor : this.unreadColor
+      this.choose4Color = choice === 4 ? this.readColor : this.unreadColor
+      this.choose5Color = choice === 5 ? this.readColor : this.unreadColor
+    },
+
+    getReadProgress() {
+      return new Promise((resolve) => {
+        storage.get({
+          key: 'readProgress',
+          success: (data) => resolve(Number(data) || 1),
+          fail: () => resolve(1)
+        })
+      })
+    }
+  }
+</script>

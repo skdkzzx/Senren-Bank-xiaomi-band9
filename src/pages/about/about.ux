@@ -1,0 +1,333 @@
+<template>
+  <div class="page" onswipe="noax">
+    <image class="bcg" src="/common/bcgi/空_夕空.jpg"></image>
+    <image class="bt" src="/common/bt.png"></image>
+    <image class="hd" src="/common/hd.png"></image>
+    <scroll id="mainScroll" class="scroll">
+      <div class="header">
+        <text class="title">关于</text>
+      </div>
+      <div class="content">
+        <text class="app-name">千恋 * 万花</text>
+        <text class="subtitle">小米手环移植版</text>
+        <block if="{{isFirstVisit}}">
+          <text class="section-title">初次游玩前请仔细阅读以下内容！阅读完毕后即可开始游戏！</text>
+        </block>
+        <div class="section-divider"></div>
+        <div class="instruction-item">
+          <text class="bullet">•</text>
+          <text class="instruction-text">点击换页</text>
+        </div>
+        <div class="instruction-item">
+          <text class="bullet">•</text>
+          <text class="instruction-text">左滑上一页</text>
+        </div>
+        <div class="instruction-item">
+          <text class="bullet">•</text>
+          <text class="instruction-text">长按隐藏文本框</text>
+        </div>
+        <div class="instruction-item">
+          <text class="bullet">•</text>
+          <text class="instruction-text">再次点击恢复</text>
+        </div>
+        <div class="instruction-item">
+          <text class="bullet">•</text>
+          <text class="instruction-text">下滑菜单</text>
+        </div>
+        <div class="instruction-item">
+          <text class="bullet">•</text>
+          <text class="instruction-text">上滑隐藏菜单</text>
+        </div>
+        <div class="section-divider"></div>
+        <div class="update-info">
+          <text class="info-text">有问题记得提出反馈</text>
+          <text class="info-text">完整安装包进入qq群或在github链接获取</text>
+          <text class="info-text"></text>
+          <text class="info-text">出现无文字的解决方案：进入设置页面调整字体粗体即可</text>
+          <text class="info-text">如果是动不了的就快速插拔充电器以重启设备</text>
+          <text class="info-text"></text>
+          <text class="info-text">完整安装包有14mb，手环解压后21mb。</text>
+          <text class="info-text"></text>
+          <text class="info-text">攻略教程：BV1SmvCepE9X</text>
+          <text class="info-text"></text>
+          <text class="info-text">注：本快应用为非官方移植</text>
+        </div>
+        <div class="contact-section">
+          <text class="section-title">Q群</text>
+          <text class="highlight-text">224262549</text>
+          <text class="info-text">GitHub开源：https://github.com/hezdaaa/qlwh-mibandported</text>
+        </div>
+        <div class="original-info">
+          <text class="info-text">移植自视觉小说</text>
+          <text class="app-name">千恋 * 万花</text>
+          <text class="app-name">非常感谢 ppc & liuyuze61 !!</text>
+          <text class="fun-text">Ciallo～(∠ ·ω< )⌒★</text>
+        </div>
+        <block if="{{isFirstVisit}}">
+          <div class="update-info">
+            <text class="info-text">请先进入设置页面调整字体粗细等设置</text>
+          </div>
+        </block>
+      </div>
+      <block if="{{isFirstVisit}}">
+        <text class="acknowledge-btn" onclick="acknowledge">我已知晓</text>
+      </block>
+      <text class="title"></text>
+    </scroll>
+    <block if="{{!isFirstVisit}}">
+      <image class="back-btn" src="/common/back.png" onclick="back"></image>
+    </block>
+  </div>
+</template>
+
+<style>
+  .page {
+    background-color: #bbbbbb;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+  }
+  .bcg {
+    position: absolute;
+    width: 336px;
+    height: 480px;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+  .bt {
+    position: absolute;
+    bottom: 0;
+  }
+  .hd {
+    position: absolute;
+    top: 0;
+  }
+  .scroll {
+    height: 400px;
+    text-align: left;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 0;
+    flex: 1;
+    width: 90%;
+  }
+  .header {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+  }
+  .title {
+    font-size: 36px;
+    color: #ebebeb;
+    font-weight: bold;
+  }
+  .back-btn {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    z-index: 10;
+  }
+  .content {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.73);
+    border-radius: 12px;
+    padding-top: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+    padding-left: 16px;
+    border-top-color: #e0e0e0;
+    border-right-color: #e0e0e0;
+    border-bottom-color: #e0e0e0;
+    border-left-color: #e0e0e0;
+    border-style: solid;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+  }
+  .app-name {
+    font-size: 24px;
+    color: #333333;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 22px;
+    color: #666666;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .author {
+    font-size: 22px;
+    color: #888888;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .section-divider {
+    width: 90%;
+    height: 1px;
+    background-color: #e0e0e0;
+    margin-top: 12px;
+    margin-right: 0;
+    margin-bottom: 12px;
+    margin-left: 0;
+  }
+  .section-title {
+    font-size: 24px;
+    color: #333333;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .instruction-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 90%;
+    margin-bottom: 6px;
+  }
+  .bullet {
+    font-size: 20px;
+    color: #4a4a4a;
+    margin-right: 8px;
+  }
+  .instruction-text {
+    font-size: 22px;
+    color: #555555;
+  }
+  .fun-text {
+    font-size: 22px;
+    color: #666666;
+    font-style: italic;
+    text-align: center;
+    margin-top: 8px;
+    margin-right: 0;
+    margin-bottom: 8px;
+    margin-left: 0;
+  }
+  .update-info {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    margin-right: 0;
+    margin-bottom: 10px;
+    margin-left: 0;
+  }
+  .info-text {
+    font-size: 22px;
+    color: #666666;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .contact-section {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 12px;
+    margin-right: 0;
+    margin-bottom: 12px;
+    margin-left: 0;
+  }
+  .highlight-text {
+    font-size: 24px;
+    color: #1a73e8;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 6px;
+    margin-right: 0;
+    margin-bottom: 6px;
+    margin-left: 0;
+  }
+  .thanks-section {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 12px;
+    margin-right: 0;
+    margin-bottom: 12px;
+    margin-left: 0;
+  }
+  .thanks-text {
+    font-size: 22px;
+    color: #666666;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .original-info {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 12px;
+    margin-right: 0;
+    margin-bottom: 12px;
+    margin-left: 0;
+  }
+  .acknowledge-btn {
+    background-color: #1a73e8;
+    color: white;
+    top: 10px;
+    font-size: 28px;
+    padding-top: 10px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    border-radius: 30px;
+    text-align: center;
+  }
+</style>
+
+<script>
+  import system from '@system.router'
+  import storage from '@system.storage'
+
+  export default {
+    data: {
+      build: false,
+      isFirstVisit: true
+    },
+    noax() {
+      console.log('swipe event prevented')
+    },
+    onInit() {
+      storage.get({
+        key: 'about_visited2',
+        success: (data) => {
+          if (data === 'true') {
+            this.isFirstVisit = false
+          } else {
+            this.isFirstVisit = true
+          }
+        },
+        fail: () => {
+          this.isFirstVisit = true
+        }
+      })
+    },
+    back() {
+      system.back({ uri: 'pages/index' })
+    },
+    setting() {
+      system.replace({ uri: 'pages/settings' })
+    },
+    acknowledge() {
+      storage.set({
+        key: 'about_visited2',
+        value: 'true',
+        success: () => {
+          this.setting()
+        },
+        fail: () => {
+          this.setting()
+        }
+      })
+    }
+  }
+</script>

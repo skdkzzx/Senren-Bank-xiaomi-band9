@@ -1,0 +1,537 @@
+<template>
+  <div class="page" onswipe="saveSettings">
+    <image class="bcg" src="/common/bcgi/空_夕空.jpg"></image>
+    <image class="bt" src="/common/bt.png"></image>
+    <image class="hd" src="/common/hd.png"></image>
+    <scroll id="mainScroll" class="scroll">
+      <div class="header">
+        <text class="title">设置</text>
+      </div>
+      <div class="setting-section">
+        <text class="section-title">文本播放速度</text>
+        <slider class="slider" min="5" max="40" step="5" value="{{textSpeed}}" onchange="updateTextSpeed"></slider>
+        <div class="slider-labels">
+          <text class="label">快</text>
+          <text class="current-value">当前速度:{{textSpeed}}ms/字</text>
+          <text class="label">慢</text>
+        </div>
+        <text class="section-title">字体大小</text>
+        <slider class="slider" min="16" max="40" step="2" value="{{fontSize}}" onchange="updateFontSize"></slider>
+        <div class="slider-labels">
+          <text class="label">小</text>
+          <text class="current-value">当前字体大小:{{fontSize}}px</text>
+          <text class="label">大</text>
+        </div>
+        <text class="section-title">自动播放速度</text>
+        <slider class="slider" min="500" max="3000" step="100" value="{{autoPlayDelay}}" onchange="updateAutoSpeed"></slider>
+        <div class="slider-labels">
+          <text class="label">快</text>
+          <text class="current-value">当前速度:{{autoPlayDelay}}ms</text>
+          <text class="label">慢</text>
+        </div>
+      </div>
+      <div class="setting-section">
+        <div class="switch-row">
+          <text class="switch-label">屏幕常亮</text>
+          <switch checked="{{screenAlwaysOn}}" class="switch" onchange="onScreenAlwaysOnChange"></switch>
+        </div>
+        <div class="switch-row">
+          <text class="switch-label">粗体</text>
+          <switch checked="{{boldText}}" class="switch" onchange="onBoldTextChange"></switch>
+        </div>
+        <div class="switch-row">
+          <text class="switch-label2">仅跳过已读文本</text>
+          <switch checked="{{skipOnlyRead}}" class="switch" onchange="onSkipOnlyReadChange"></switch>
+        </div>
+      </div>
+      <div class="setting-section">
+        <text class="section-title">未读文本颜色</text>
+        <div class="color-picker">
+          <block for="{{item in unreadColors}}" tid="$idx">
+            <div class="color-option" onclick="selectUnreadColor($idx)">
+              <div class="color-circle" style="background-color: {{item.color}};"></div>
+              <block if="{{item.color === unreadColor}}">
+                <div class="color-check"></div>
+              </block>
+            </div>
+          </block>
+        </div>
+        <text class="section-title">已读文本颜色</text>
+        <div class="color-picker">
+          <block for="{{item in readColors}}" tid="$idx">
+            <div class="color-option" onclick="selectReadColor($idx)">
+              <div class="color-circle" style="background-color: {{item.color}};"></div>
+              <block if="{{item.color === readColor}}">
+                <div class="color-check"></div>
+              </block>
+            </div>
+          </block>
+        </div>
+      </div>
+      <div class="setting-section">
+        <text class="section-title">!!!用户数据慎重重置!!!</text>
+        <text class="reset" onclick="resetAllSettings">重置所有设置</text>
+        <text class="reset" onlongpress="resetUserData">长按重置用户数据</text>
+      </div>
+      <div class="setting-section">
+        <text class="section-title">颜色预览</text>
+        <div class="preview-area">
+          <text class="preview-text" style="font-size: {{fontSize}}px; color: {{unreadColor}}; font-weight: {{boldText ? 'bold' : 'normal'}}">未读文本颜色预览</text>
+          <text class="preview-text" style="font-size: {{fontSize}}px; color: {{readColor}}; font-weight: {{boldText ? 'bold' : 'normal'}}">已读文本颜色预览</text>
+        </div>
+      </div>
+      <div class="setting-section">
+        <text class="section-title">速度预览</text>
+        <div class="preview-area" onclick="startPreview">
+          <text class="preview-text" style="font-size: {{fontSize}}px; font-weight: {{boldText ? 'bold' : 'normal'}}">{{previewText}}</text>
+        </div>
+        <text class="hint-text">点击预览区域测试效果</text>
+      </div>
+      <text class="title"></text>
+    </scroll>
+    <image class="back-btn" src="/common/back.png" onclick="back"></image>
+  </div>
+</template>
+
+<style>
+  .page {
+    background-color: #f5f5f7;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .bcg {
+    position: absolute;
+    width: 336px;
+    height: 480px;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+  .bt {
+    position: absolute;
+    bottom: 0;
+  }
+  .hd {
+    position: absolute;
+    top: 0;
+  }
+  .scroll {
+    height: 400px;
+    text-align: left;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 0;
+    flex: 1;
+    width: 90%;
+  }
+  .header {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+  }
+  .title {
+    font-size: 36px;
+    color: #ebebeb;
+    font-weight: bold;
+  }
+  .back-btn {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+  }
+  .setting-section {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 12px;
+    padding-top: 12px;
+    padding-right: 12px;
+    padding-bottom: 12px;
+    padding-left: 12px;
+    margin-bottom: 12px;
+    border-top-color: #e0e0e0;
+    border-right-color: #e0e0e0;
+    border-bottom-color: #e0e0e0;
+    border-left-color: #e0e0e0;
+    border-style: solid;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+  }
+  .section-title {
+    font-size: 26px;
+    color: #333333;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .switch-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    padding-top: 8px;
+    padding-right: 0;
+    padding-bottom: 8px;
+    padding-left: 0;
+    border-bottom-style: none;
+  }
+  .switch-label {
+    font-size: 26px;
+    color: #333333;
+    font-weight: bold;
+    flex: 1;
+  }
+  .switch-label2 {
+    font-size: 20px;
+    color: #333333;
+    font-weight: bold;
+    flex: 1;
+  }
+  .switch {
+    margin-left: 15px;
+    height: 30px;
+    width: 70px;
+  }
+  .slider {
+    width: 90%;
+    margin-top: 8px;
+    margin-bottom: 6px;
+  }
+  .slider-labels {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 90%;
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+  .label {
+    font-size: 22px;
+    color: #666666;
+  }
+  .current-value {
+    font-size: 22px;
+    color: #888888;
+    text-align: center;
+  }
+  .reset {
+    font-size: 24px;
+    color: #ea6c6c;
+    font-weight: bold;
+    margin-top: 15px;
+    padding-top: 8px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    border-top-color: #ea6c6c;
+    border-right-color: #ea6c6c;
+    border-bottom-color: #ea6c6c;
+    border-left-color: #ea6c6c;
+    border-style: solid;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-radius: 8px;
+    background-color: rgba(234, 108, 108, 0.1);
+  }
+  .preview-area {
+    width: 95%;
+    min-height: 80px;
+    background-color: rgba(0, 0, 0, 0.07);
+    border-radius: 8px;
+    border-top-color: #e0e0e0;
+    border-right-color: #e0e0e0;
+    border-bottom-color: #e0e0e0;
+    border-left-color: #e0e0e0;
+    border-style: solid;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    padding-top: 12px;
+    padding-right: 12px;
+    padding-bottom: 12px;
+    padding-left: 12px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  .preview-text {
+    color: #000000;
+    text-align: center;
+  }
+  .color-picker {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 4px;
+  }
+  .color-option {
+    flex-direction: column;
+    align-items: center;
+    margin-left: 12px;
+    margin-right: 12px;
+    padding-top: 4px;
+    padding-right: 4px;
+    padding-bottom: 4px;
+    padding-left: 4px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.03);
+    width: 40px;
+    position: relative;
+  }
+  .color-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 16px;
+    border-top-color: #dddddd;
+    border-right-color: #dddddd;
+    border-bottom-color: #dddddd;
+    border-left-color: #dddddd;
+    border-style: solid;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+  }
+  .color-name {
+    font-size: 12px;
+    color: #666666;
+    margin-top: 4px;
+    text-align: center;
+  }
+  .color-check {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    background-color: #4caf50;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    line-height: 18px;
+  }
+  .hint-text {
+    font-size: 20px;
+    color: #888888;
+    text-align: center;
+    margin-top: 4px;
+  }
+</style>
+
+<script>
+  import router from '@system.router'
+  import storage from '@system.storage'
+  import prompt from '@system.prompt'
+
+  export default {
+    data: {
+      textSpeed: 15,
+      fontSize: 22,
+      autoPlayDelay: 1600,
+      screenAlwaysOn: true,
+      boldText: false,
+      skipOnlyRead: true,
+      unreadColor: '#ffffff',
+      readColor: '#d495d4',
+      previewText: '点击这里预览文本播放效果',
+      previewTimeoutIds: [],
+      unreadColors: [
+        { name: '白色', color: '#ffffff' },
+        { name: '淡蓝', color: '#a0d2ff' },
+        { name: '淡灰', color: '#cccccc' },
+        { name: '淡紫', color: '#e6a0ff' }
+      ],
+      readColors: [
+        { name: '淡紫', color: '#e6a0ff' },
+        { name: '蓝色', color: '#6688cc' },
+        { name: '灰色', color: '#aaaaaa' },
+        { name: '白色', color: '#ffffff' }
+      ]
+    },
+    onInit() {
+      this.loadSettings()
+    },
+    onDestroy() {
+      this.clearAllTimeouts()
+    },
+    back() {
+      this.saveSettings()
+      router.back()
+    },
+    onBackPress() {
+      this.saveSettings()
+      return false
+    },
+    loadSettings() {
+      storage.get({ key: 'textSpeedSetting', success: (data) => { if (data) this.textSpeed = Number(data) } })
+      storage.get({ key: 'fontSizeSetting', success: (data) => { if (data) this.fontSize = Number(data) } })
+      storage.get({ key: 'autoPlayDelaySetting', success: (data) => { if (data) this.autoPlayDelay = Number(data) } })
+      storage.get({ key: 'screenAlwaysOnSetting', success: (data) => { if (data != null) this.screenAlwaysOn = data === 'true' } })
+      storage.get({ key: 'boldTextSetting', success: (data) => { if (data != null) this.boldText = data === 'true' } })
+      storage.get({ key: 'skipOnlyReadSetting', success: (data) => { if (data != null) this.skipOnlyRead = data === 'true' } })
+      storage.get({ key: 'unreadColorSetting', success: (data) => { if (data) this.unreadColor = data } })
+      storage.get({ key: 'readColorSetting', success: (data) => { if (data) this.readColor = data } })
+    },
+    updateTextSpeed(e) {
+      this.textSpeed = e.progress
+    },
+    updateFontSize(e) {
+      this.fontSize = e.progress
+    },
+    updateAutoSpeed(e) {
+      this.autoPlayDelay = e.progress
+    },
+    onScreenAlwaysOnChange(e) {
+      this.screenAlwaysOn = e.checked
+    },
+    onBoldTextChange(e) {
+      this.boldText = e.checked
+    },
+    onSkipOnlyReadChange(e) {
+      this.skipOnlyRead = e.checked
+    },
+    selectUnreadColor(index) {
+      this.unreadColor = this.unreadColors[index].color
+    },
+    selectReadColor(index) {
+      this.readColor = this.readColors[index].color
+    },
+    startPreview() {
+      this.clearAllTimeouts()
+      this.previewText = ''
+      let text = '这是一个文本播放速度的预览示例，您可以调整滑块来改变播放速度。'
+      for (let i = 0; i <= text.length; i++) {
+        let timer = setTimeout(() => {
+          this.previewText = text.substring(0, i)
+          if (i === text.length) {
+            let repeatTimer = setTimeout(() => {
+              this.startPreview()
+            }, 2000)
+            this.previewTimeoutIds.push(repeatTimer)
+          }
+        }, i * this.textSpeed * 0.5)
+        this.previewTimeoutIds.push(timer)
+      }
+    },
+    clearAllTimeouts() {
+      this.previewTimeoutIds.forEach((timer) => {
+        clearTimeout(timer)
+      })
+      this.previewTimeoutIds = []
+    },
+    resetAllSettings() {
+      this.resetToDefaults()
+      prompt.showToast({ message: '所有设置已重置为默认值', duration: 2000 })
+    },
+    resetUserData() {
+      this.performUserDataReset()
+      prompt.showToast({ message: '用户数据重置中', duration: 2000 })
+    },
+    async performUserDataReset() {
+      console.log('开始重置用户数据（适配分块存储）')
+      storage.set({
+        key: 'readProgress',
+        value: '1',
+        success: () => { console.log('阅读进度已重置为1') },
+        fail: (err) => { console.error('重置阅读进度失败:', err) }
+      })
+      let blockDeletePromises = []
+      for (let i = 0; i < 150; i++) {
+        let p = new Promise((resolve) => {
+          storage.delete({
+            key: `readBlock_${i}`,
+            success: () => { console.log(`已删除块 readBlock_${i}`); resolve(true) },
+            fail: (err) => { console.log(`块 readBlock_${i} 删除失败或不存在:`, err); resolve(true) }
+          })
+        })
+        blockDeletePromises.push(p)
+      }
+      storage.set({
+        key: 'readPages',
+        value: JSON.stringify({}),
+        success: () => { console.log('已读页面记录（旧版）已清空') },
+        fail: (err) => { console.error('清空已读页面记录（旧版）失败:', err) }
+      })
+      storage.set({
+        key: 'branchChoices',
+        value: JSON.stringify({}),
+        success: () => { console.log('分支选择记录已清空') },
+        fail: (err) => { console.error('清空分支选择记录失败:', err) }
+      })
+      let savePromises = []
+      for (let i = 1; i <= 30; i++) {
+        let p = new Promise((resolve) => {
+          storage.set({
+            key: `p${i}`,
+            value: '1',
+            success: () => { console.log(`存档${i}已重置为1`); resolve(true) },
+            fail: (err) => { console.error(`重置存档${i}失败:`, err); resolve(false) }
+          })
+        })
+        savePromises.push(p)
+      }
+      storage.set({
+        key: 'saveSlots',
+        value: JSON.stringify([
+          { id: 1, text: '空', progress: 1 },
+          { id: 2, text: '空', progress: 1 },
+          { id: 3, text: '空', progress: 1 },
+          { id: 4, text: '空', progress: 1 },
+          { id: 5, text: '空', progress: 1 }
+        ]),
+        success: () => { console.log('存档位配置已重置为默认值') },
+        fail: (err) => { console.error('重置存档位配置失败:', err) }
+      })
+      try {
+        await Promise.all([...blockDeletePromises, ...savePromises])
+        console.log('所有用户数据已重置完成')
+        prompt.showToast({ message: '用户数据已重置', duration: 3000 })
+      } catch (e) {
+        console.error('重置用户数据过程中出错:', e)
+        prompt.showToast({ message: '重置过程中出现错误', duration: 3000 })
+      }
+    },
+    resetToDefaults() {
+      this.textSpeed = 15
+      this.fontSize = 22
+      this.autoPlayDelay = 1600
+      this.screenAlwaysOn = true
+      this.boldText = false
+      this.skipOnlyRead = true
+      this.unreadColor = '#ffffff'
+      this.readColor = '#e6a0ff'
+      this.clearAllTimeouts()
+      this.previewText = '点击这里预览文本播放效果'
+      this.saveSettings()
+      console.log('设置已重置为默认值')
+    },
+    saveSettings() {
+      storage.set({ key: 'textSpeedSetting', value: this.textSpeed.toString() })
+      storage.set({ key: 'fontSizeSetting', value: this.fontSize.toString() })
+      storage.set({ key: 'autoPlayDelaySetting', value: this.autoPlayDelay.toString() })
+      storage.set({ key: 'screenAlwaysOnSetting', value: this.screenAlwaysOn.toString() })
+      storage.set({ key: 'boldTextSetting', value: this.boldText.toString() })
+      storage.set({ key: 'skipOnlyReadSetting', value: this.skipOnlyRead.toString() })
+      storage.set({ key: 'unreadColorSetting', value: this.unreadColor })
+      storage.set({ key: 'readColorSetting', value: this.readColor })
+      console.log('设置已保存')
+    }
+  }
+</script>
