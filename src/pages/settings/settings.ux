@@ -1,9 +1,9 @@
 <template>
-  <div class="page" onswipe="saveSettings">
+  <div class="page" onswipe="onPageSwipe">
     <image class="bcg" src="/common/bcgi/空_夕空.jpg"></image>
     <image class="bt" src="/common/bt.png"></image>
     <image class="hd" src="/common/hd.png"></image>
-    <scroll id="mainScroll" class="scroll">
+    <scroll id="mainScroll" class="scroll" scroll-y="{{true}}">
       <div class="header">
         <text class="title">设置</text>
       </div>
@@ -22,12 +22,26 @@
           <text class="current-value">当前字体大小:{{fontSize}}px</text>
           <text class="label">大</text>
         </div>
+        <text class="section-title">角色名大小</text>
+        <slider class="slider" min="16" max="30" step="2" value="{{characterNameFontSize}}" onchange="updateCharacterNameFontSize"></slider>
+        <div class="slider-labels">
+          <text class="label">小</text>
+          <text class="current-value">当前大小:{{characterNameFontSize}}px</text>
+          <text class="label">大</text>
+        </div>
         <text class="section-title">自动播放速度</text>
         <slider class="slider" min="500" max="3000" step="100" value="{{autoPlayDelay}}" onchange="updateAutoSpeed"></slider>
         <div class="slider-labels">
           <text class="label">快</text>
           <text class="current-value">当前速度:{{autoPlayDelay}}ms</text>
           <text class="label">慢</text>
+        </div>
+        <text class="section-title">背景滚动速度</text>
+        <slider class="slider" min="1" max="10" step="1" value="{{bgScrollSpeed}}" onchange="updateBgScrollSpeed"></slider>
+        <div class="slider-labels">
+          <text class="label">慢</text>
+          <text class="current-value">当前速度:{{bgScrollSpeed}}</text>
+          <text class="label">快</text>
         </div>
       </div>
       <div class="setting-section">
@@ -73,6 +87,13 @@
         <text class="reset" onclick="resetAllSettings">重置所有设置</text>
         <text class="reset" onlongpress="resetUserData">长按重置用户数据</text>
       </div>
+      <div class="scroll-bottom-space"></div>
+    </scroll>
+    <div class="back-btn-wrap" onclick="back">
+      <text class="back-btn-text">返回</text>
+    </div>
+  </div>
+</template>
       <div class="setting-section">
         <text class="section-title">颜色预览</text>
         <div class="preview-area">
@@ -89,7 +110,6 @@
       </div>
       <text class="title"></text>
     </scroll>
-    <image class="back-btn" src="/common/back.png" onclick="back"></image>
   </div>
 </template>
 
@@ -102,8 +122,8 @@
   }
   .bcg {
     position: absolute;
-    width: 336px;
-    height: 480px;
+    width: 192px;
+    height: 490px;
     top: 0;
     left: 0;
     z-index: -1;
@@ -111,52 +131,51 @@
   .bt {
     position: absolute;
     bottom: 0;
+    width: 192px;
+    z-index: 5;
   }
   .hd {
     position: absolute;
     top: 0;
+    width: 192px;
+    z-index: 5;
   }
   .scroll {
-    height: 400px;
+    width: 182px;
+    height: 440px;
     text-align: left;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    z-index: 0;
+    z-index: 2;
     flex: 1;
-    width: 90%;
   }
   .header {
-    flex-direction: row;
+    width: 192px;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    margin-top: 20px;
-    margin-right: 20px;
-    margin-bottom: 20px;
-    margin-left: 20px;
+    margin-top: 13px;
+    margin-right: 0;
+    margin-bottom: 10px;
+    margin-left: 0;
+    z-index: 10;
   }
   .title {
-    font-size: 36px;
+    font-size: 30px;
     color: #ebebeb;
     font-weight: bold;
-  }
-  .back-btn {
-    position: absolute;
-    left: 15px;
-    top: 15px;
   }
   .setting-section {
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.75);
-    border-radius: 12px;
-    padding-top: 12px;
-    padding-right: 12px;
-    padding-bottom: 12px;
-    padding-left: 12px;
-    margin-bottom: 12px;
+    width: 176px;
+    background-color: rgba(255, 255, 255, 0.747);
+    border-radius: 9px;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    margin-bottom: 10px;
     border-top-color: #e0e0e0;
     border-right-color: #e0e0e0;
     border-bottom-color: #e0e0e0;
@@ -168,7 +187,7 @@
     border-left-width: 1px;
   }
   .section-title {
-    font-size: 26px;
+    font-size: 24px;
     color: #333333;
     font-weight: bold;
     margin-bottom: 8px;
@@ -178,7 +197,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 90%;
+    width: 100%;
     padding-top: 8px;
     padding-right: 0;
     padding-bottom: 8px;
@@ -186,7 +205,7 @@
     border-bottom-style: none;
   }
   .switch-label {
-    font-size: 26px;
+    font-size: 24px;
     color: #333333;
     font-weight: bold;
     flex: 1;
@@ -198,21 +217,21 @@
     flex: 1;
   }
   .switch {
-    margin-left: 15px;
-    height: 30px;
-    width: 70px;
+    margin-left: 11px;
+    height: 22px;
+    width: 48px;
   }
   .slider {
-    width: 90%;
+    width: 100%;
     margin-top: 8px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
   }
   .slider-labels {
     flex-direction: row;
     justify-content: space-between;
-    width: 90%;
-    margin-top: 6px;
-    margin-bottom: 6px;
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
   }
   .label {
     font-size: 22px;
@@ -227,10 +246,10 @@
     font-size: 24px;
     color: #ea6c6c;
     font-weight: bold;
-    margin-top: 15px;
-    padding-top: 8px;
+    margin-top: 12px;
+    padding-top: 9px;
     padding-right: 16px;
-    padding-bottom: 8px;
+    padding-bottom: 9px;
     padding-left: 16px;
     border-top-color: #ea6c6c;
     border-right-color: #ea6c6c;
@@ -245,10 +264,10 @@
     background-color: rgba(234, 108, 108, 0.1);
   }
   .preview-area {
-    width: 95%;
-    min-height: 80px;
-    background-color: rgba(0, 0, 0, 0.07);
-    border-radius: 8px;
+    width: 100%;
+    min-height: 60px;
+    background-color: rgba(0, 0, 0, 0.068);
+    border-radius: 7px;
     border-top-color: #e0e0e0;
     border-right-color: #e0e0e0;
     border-bottom-color: #e0e0e0;
@@ -258,10 +277,10 @@
     border-right-width: 1px;
     border-bottom-width: 1px;
     border-left-width: 1px;
-    padding-top: 12px;
-    padding-right: 12px;
-    padding-bottom: 12px;
-    padding-left: 12px;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
     margin-top: 8px;
     margin-bottom: 8px;
     justify-content: center;
@@ -283,49 +302,49 @@
   .color-option {
     flex-direction: column;
     align-items: center;
-    margin-left: 12px;
-    margin-right: 12px;
+    margin-left: 10px;
+    margin-right: 10px;
     padding-top: 4px;
     padding-right: 4px;
     padding-bottom: 4px;
     padding-left: 4px;
-    border-radius: 8px;
+    border-radius: 7px;
     background-color: rgba(0, 0, 0, 0.03);
-    width: 40px;
+    width: 30px;
     position: relative;
   }
   .color-circle {
-    width: 36px;
-    height: 36px;
-    border-radius: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 14px;
     border-top-color: #dddddd;
     border-right-color: #dddddd;
     border-bottom-color: #dddddd;
     border-left-color: #dddddd;
     border-style: solid;
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
   }
   .color-name {
-    font-size: 12px;
+    font-size: 10px;
     color: #666666;
-    margin-top: 4px;
+    margin-top: 3px;
     text-align: center;
   }
   .color-check {
     position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 18px;
-    height: 18px;
-    border-radius: 9px;
+    top: 1px;
+    right: 1px;
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
     background-color: #4caf50;
     color: white;
-    font-size: 14px;
+    font-size: 10px;
     text-align: center;
-    line-height: 18px;
+    line-height: 14px;
   }
   .hint-text {
     font-size: 20px;
@@ -333,18 +352,45 @@
     text-align: center;
     margin-top: 4px;
   }
+  .back-btn-wrap {
+    position: absolute;
+    bottom: 0;
+    width: 192px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-color: #333333;
+    border-style: solid;
+  }
+  .back-btn-text {
+    font-size: 26px;
+    color: #333333;
+    text-align: center;
+  }
+  .scroll-bottom-space {
+    height: 60px;
+  }
 </style>
 
 <script>
   import router from '@system.router'
   import storage from '@system.storage'
   import prompt from '@system.prompt'
+  import { SETTINGS_CONFIG, DEFAULT_SAVE_SLOTS } from '../../common/config.js'
 
   export default {
     data: {
       textSpeed: 15,
       fontSize: 22,
+      characterNameFontSize: 22,
       autoPlayDelay: 1600,
+      bgScrollSpeed: 5,
       screenAlwaysOn: true,
       boldText: false,
       skipOnlyRead: true,
@@ -380,14 +426,19 @@
       return false
     },
     loadSettings() {
-      storage.get({ key: 'textSpeedSetting', success: (data) => { if (data) this.textSpeed = Number(data) } })
-      storage.get({ key: 'fontSizeSetting', success: (data) => { if (data) this.fontSize = Number(data) } })
-      storage.get({ key: 'autoPlayDelaySetting', success: (data) => { if (data) this.autoPlayDelay = Number(data) } })
-      storage.get({ key: 'screenAlwaysOnSetting', success: (data) => { if (data != null) this.screenAlwaysOn = data === 'true' } })
-      storage.get({ key: 'boldTextSetting', success: (data) => { if (data != null) this.boldText = data === 'true' } })
-      storage.get({ key: 'skipOnlyReadSetting', success: (data) => { if (data != null) this.skipOnlyRead = data === 'true' } })
-      storage.get({ key: 'unreadColorSetting', success: (data) => { if (data) this.unreadColor = data } })
-      storage.get({ key: 'readColorSetting', success: (data) => { if (data) this.readColor = data } })
+      const settings = SETTINGS_CONFIG
+      settings.forEach(({ key, prop, type }) => {
+        storage.get({
+          key,
+          success: (data) => {
+            if (data !== null && data !== undefined && data !== '') {
+              if (type === 'number') this[prop] = Number(data)
+              else if (type === 'boolean') this[prop] = data === 'true'
+              else this[prop] = data
+            }
+          }
+        })
+      })
     },
     updateTextSpeed(e) {
       this.textSpeed = e.progress
@@ -395,8 +446,14 @@
     updateFontSize(e) {
       this.fontSize = e.progress
     },
+    updateCharacterNameFontSize(e) {
+      this.characterNameFontSize = e.progress
+    },
     updateAutoSpeed(e) {
       this.autoPlayDelay = e.progress
+    },
+    updateBgScrollSpeed(e) {
+      this.bgScrollSpeed = e.progress
     },
     onScreenAlwaysOnChange(e) {
       this.screenAlwaysOn = e.checked
@@ -489,13 +546,7 @@
       }
       storage.set({
         key: 'saveSlots',
-        value: JSON.stringify([
-          { id: 1, text: '空', progress: 1 },
-          { id: 2, text: '空', progress: 1 },
-          { id: 3, text: '空', progress: 1 },
-          { id: 4, text: '空', progress: 1 },
-          { id: 5, text: '空', progress: 1 }
-        ]),
+        value: JSON.stringify(DEFAULT_SAVE_SLOTS),
         success: () => { console.log('存档位配置已重置为默认值') },
         fail: (err) => { console.error('重置存档位配置失败:', err) }
       })
@@ -511,7 +562,9 @@
     resetToDefaults() {
       this.textSpeed = 15
       this.fontSize = 22
+      this.characterNameFontSize = 22
       this.autoPlayDelay = 1600
+      this.bgScrollSpeed = 5
       this.screenAlwaysOn = true
       this.boldText = false
       this.skipOnlyRead = true
@@ -522,15 +575,18 @@
       this.saveSettings()
       console.log('设置已重置为默认值')
     },
+    onPageSwipe(e) {
+      if (e.direction === 'right' || e.direction === 'left') return
+      this.saveSettings()
+    },
     saveSettings() {
-      storage.set({ key: 'textSpeedSetting', value: this.textSpeed.toString() })
-      storage.set({ key: 'fontSizeSetting', value: this.fontSize.toString() })
-      storage.set({ key: 'autoPlayDelaySetting', value: this.autoPlayDelay.toString() })
-      storage.set({ key: 'screenAlwaysOnSetting', value: this.screenAlwaysOn.toString() })
-      storage.set({ key: 'boldTextSetting', value: this.boldText.toString() })
-      storage.set({ key: 'skipOnlyReadSetting', value: this.skipOnlyRead.toString() })
-      storage.set({ key: 'unreadColorSetting', value: this.unreadColor })
-      storage.set({ key: 'readColorSetting', value: this.readColor })
+      const settings = SETTINGS_CONFIG.map(({ key, prop }) => ({
+        key,
+        value: this[prop].toString()
+      }))
+      settings.forEach(({ key, value }) => {
+        storage.set({ key, value })
+      })
       console.log('设置已保存')
     }
   }

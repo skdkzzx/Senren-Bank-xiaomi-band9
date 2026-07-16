@@ -1,7 +1,7 @@
 <template>
   <div class="page" onswipe="loadpageProccess">
     <block if="{{uishow}}">
-      <image class="background" src="/common/title_bg.jpg"></image>
+      <image class="background" src="{{bg}}" onclick="hidui"></image>
     </block>
     <block if="{{uishow}}">
       <image class="logo" src="/pages/index/deactivelogo.png"></image>
@@ -17,7 +17,7 @@
         <text class="mid" onclick="start">开始游戏</text>
       </block>
       <block if="{{uishow}}">
-        <text class="mid" onclick="lastStart">从上次开始</text>
+        <text class="mid" onclick="lastStart">继续上次</text>
       </block>
       <block if="{{uishow}}">
         <text class="mid" onclick="loadProccess">读取存档</text>
@@ -33,171 +33,33 @@
       <image class="reset2" src="/common/reset.png" onclick="reset"></image>
     </block>
     <block if="{{!uishow}}">
-      <image class="background2" src="/common/title_bg.jpg" onclick="hidui"></image>
+      <image class="background2" src="{{bg}}" onclick="hidui"></image>
+    </block>
+    <block if="{{uishow}}">
+      <image class="reset" src="/common/reset.png" onclick="reset"></image>
     </block>
     <block if="{{uishow}}">
       <image class="back" src="/common/go.png" onclick="die"></image>
     </block>
     <block if="{{loadShow}}">
       <div class="page1">
-        <text class="load" onclick="unloadProccess">返回</text>
-        <scroll id="mainScroll" class="scroll" bounces="true">
-          <block for="{{item in saveSlots}}" tid="index">
-            <div class="save-item" onclick="loadSlot(index + 1)">
-              <text class="load">存档{{index + 1}}: {{item.text}}</text>
-            </div>
-          </block>
+        <div class="time-bar">
+          <text class="time-text">{{currentTime}}</text>
+        </div>
+        <scroll id="mainScroll" class="scroll" scroll-y="{{true}}" bounces="true">
+          <div class="save-item" for="{{(index, item) in saveSlots}}" onclick="loadSlot(index + 1)">
+            <text class="load">存档{{index + 1}}: {{item.text}}</text>
+          </div>
+          <div class="scroll-bottom-space"></div>
           <text class="load2"></text>
         </scroll>
+        <div class="back-btn-wrap" onclick="unloadProccess">
+          <text class="back-btn-text">返回</text>
+        </div>
       </div>
     </block>
   </div>
 </template>
-
-<style>
-  .page {
-    background-color: rgb(248, 248, 255);
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    margin-top: auto;
-    margin-right: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-  }
-  .about {
-    background-color: rgba(255, 255, 255, 0);
-    justify-content: flex-start;
-    align-items: flex-end;
-    top: 15px;
-    right: 250px;
-    position: absolute;
-  }
-  .hd {
-    position: absolute;
-    top: 0;
-  }
-  .background {
-    top: 0px;
-    position: absolute;
-  }
-  .background2 {
-    top: 100px;
-    position: absolute;
-  }
-  .reset2 {
-    background-color: rgba(255, 255, 255, 0);
-    justify-content: flex-start;
-    align-items: flex-end;
-    bottom: 15px;
-    right: 15px;
-    position: absolute;
-  }
-  .logo {
-    top: 95px;
-  }
-  .settings {
-    background-color: rgba(255, 255, 255, 0);
-    justify-content: flex-start;
-    align-items: flex-end;
-    top: 15px;
-    left: 250px;
-    position: absolute;
-  }
-  .reset {
-    background-color: rgba(255, 255, 255, 0);
-    justify-content: flex-start;
-    align-items: flex-end;
-    bottom: 100px;
-    right: 15px;
-    position: absolute;
-  }
-  .back {
-    background-color: rgba(255, 255, 255, 0);
-    justify-content: flex-start;
-    align-items: flex-end;
-    bottom: 15px;
-    right: 15px;
-    position: absolute;
-  }
-  .group-1 {
-    top: 75px;
-    flex-direction: column;
-    width: 80%;
-  }
-  .mid {
-    margin-bottom: 10px;
-    font-size: 35px;
-    color: #000000;
-    font-weight: 800;
-  }
-  .bc {
-    position: absolute;
-    width: 336px;
-    height: 480px;
-    top: 0;
-    left: 0;
-    background-color: rgb(116, 69, 47);
-    z-index: -1;
-  }
-  .page1 {
-    margin-top: auto;
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0.88);
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    margin-right: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    width: 100%;
-  }
-  .page3 {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0.88);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: auto;
-    margin-right: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    width: 100%;
-    bottom: 0;
-    top: 0;
-  }
-  .load {
-    margin-top: 20px;
-    font-size: 35px;
-    color: #000000;
-    font-weight: 800;
-    width: 80%;
-    background-color: rgba(250, 233, 187, 0.51);
-  }
-  .load2 {
-    margin-top: 15px;
-    font-size: 40px;
-    color: #000000;
-    font-weight: 800;
-    width: 80%;
-  }
-  .scroll {
-    top: 5px;
-    height: 400px;
-    text-align: left;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    z-index: 0;
-    flex: 1;
-    width: 100%;
-  }
-  .save-item {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-</style>
 
 <script>
   import system from '@system.app'
@@ -209,6 +71,7 @@
     data: {
       uishow: true,
       readProgress: 1,
+      currentTime: '',
       saveSlots: [
         { id: 1, text: '空', progress: 1 },
         { id: 2, text: '空', progress: 1 },
@@ -216,7 +79,7 @@
         { id: 4, text: '空', progress: 1 },
         { id: 5, text: '空', progress: 1 }
       ],
-      maxSaveSlots: 100,
+      maxSaveSlots: 30,
       loadShow: false,
       loading: false,
       bgIndex: 0,
@@ -231,7 +94,7 @@
         '/common/title_bg7.jpg',
         '/common/title_bg8.jpg'
       ],
-      bg: '/common/title_bg.jpg',
+      bg: '/common/title_bg0.jpg',
       firstLaunchChecked: false
     },
     back() {},
@@ -241,36 +104,38 @@
     hidui() {
       this.uishow = !this.uishow
     },
+    updateTime() {
+      let now = new Date()
+      let h = now.getHours()
+      let m = now.getMinutes()
+      h = h < 10 ? '0' + h : h
+      m = m < 10 ? '0' + m : m
+      this.currentTime = `${h}:${m}`
+    },
     async onShow() {
       this.checkFirstLaunch()
+      this.updateTime()
       storage.get({
         key: 'bg',
         success: (data) => {
-          console.log('读取背景索引成功:', data)
           let index = parseInt(data)
           if (!isNaN(index) && index >= 0 && index < this.bgList.length) {
             this.bgIndex = index
-            console.log('使用保存的背景索引:', this.bgIndex)
           } else {
-            console.log('背景索引无效，使用默认值0')
             this.bgIndex = 0
           }
           this.updateBackground()
         },
         fail: () => {
-          console.log('未找到背景设置，使用默认值')
           this.updateBackground()
         }
       })
       storage.get({
         key: 'readProgress',
         success: (data) => {
-          console.log('流动进度读取成功')
           this.readProgress = Number(data) || 1
         },
-        fail: (data) => {
-          console.log(`流动读取失败,${data}`)
-        }
+        fail: () => {}
       })
       await this.loadSaveSlots()
     },
@@ -282,8 +147,7 @@
             success: (data) => {
               if (data) {
                 try {
-                  let parsed = JSON.parse(data)
-                  resolve(parsed)
+                  resolve(JSON.parse(data))
                 } catch (e) {
                   resolve(null)
                 }
@@ -291,37 +155,31 @@
                 resolve(null)
               }
             },
-            fail: () => {
-              resolve(null)
-            }
+            fail: () => resolve(null)
           })
         })
         if (slots && Array.isArray(slots)) {
           this.saveSlots = slots
         }
-        let promises = []
-        for (let i = 0; i < this.saveSlots.length; i++) {
-          let p = new Promise((resolve) => {
+        let promises = this.saveSlots.map((slot, i) => {
+          return new Promise((resolve) => {
             storage.get({
               key: `p${i + 1}`,
               success: (data) => {
                 let progress = Number(data) || 1
-                this.saveSlots[i].progress = progress
-                this.saveSlots[i].text = progress === 1 ? '空' : `进度${progress}`
+                slot.progress = progress
+                slot.text = progress === 1 ? '空' : `进度${progress}`
                 resolve(true)
               },
-              fail: (data) => {
-                console.log(`存档${i + 1}读取失败:`, data)
-                this.saveSlots[i].progress = 1
-                this.saveSlots[i].text = '空'
+              fail: () => {
+                slot.progress = 1
+                slot.text = '空'
                 resolve(false)
               }
             })
           })
-          promises.push(p)
-        }
+        })
         await Promise.all(promises)
-        console.log(`加载了${this.saveSlots.length}个存档位`)
       } catch (e) {
         console.error('加载存档时出错:', e)
       }
@@ -332,12 +190,8 @@
       storage.set({
         key: 'bg',
         value: String(this.bgIndex),
-        success: () => {
-          console.log(`背景索引保存成功: ${this.bgIndex}`)
-        },
-        fail: (data) => {
-          console.error('背景保存失败:', data)
-        }
+        success: () => {},
+        fail: () => {}
       })
     },
     updateBackground() {
@@ -345,23 +199,20 @@
       this.bg = this.bgList[index]
     },
     loadSlot(slot) {
-      console.log('加载存档:', slot)
       storage.get({
         key: `p${slot}`,
         success: (data) => {
           let progress = Number(data) || 1
-          console.log(`从存档${slot}读取进度:`, progress)
           storage.set({
             key: 'readProgress',
             value: progress.toString(),
-            success: () => console.log('进度设置成功'),
-            fail: (err) => console.error('进度设置失败:', err)
+            success: () => {},
+            fail: () => {}
           })
           router.replace({ uri: 'pages/detail' })
           this.loadShow = false
         },
-        fail: (data) => {
-          console.error(`读取存档${slot}失败:`, data)
+        fail: () => {
           prompt.showToast({ message: '加载失败', duration: 2000 })
         }
       })
@@ -379,17 +230,15 @@
       system.terminate()
     },
     start() {
-      this.loadingp()
       storage.set({
         key: 'readProgress',
-        value: JSON.stringify(1),
-        success: () => console.log('进度重置成功'),
-        fail: (err) => console.error('进度重置失败:', err)
+        value: '1',
+        success: () => {},
+        fail: () => {}
       })
       router.replace({ uri: 'pages/detail' })
     },
     lastStart() {
-      this.loadingp()
       router.replace({ uri: 'pages/detail' })
     },
     loadProccess() {
@@ -432,3 +281,182 @@
     }
   }
 </script>
+
+<style>
+  .page {
+    background-color: rgb(248, 248, 255);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 490px;
+    overflow: hidden;
+  }
+  .about {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    top: 15px;
+    left: 22px;
+    position: absolute;
+  }
+  .logo {
+    top: 187px;
+    position: absolute;
+    width: 170px;
+    object-fit: contain;
+    z-index: 3;
+  }
+  .background {
+    top: 90px;
+    position: absolute;
+    width: 192px;
+    object-fit: cover;
+    z-index: 1;
+  }
+  .background2 {
+    top: 130px;
+    position: absolute;
+    width: 192px;
+    object-fit: cover;
+  }
+  .reset2 {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    bottom: 15px;
+    right: 25px;
+    position: absolute;
+  }
+  .settings {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    top: 15px;
+    right: 22px;
+    position: absolute;
+  }
+  .reset {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    bottom: 130px;
+    right: 6px;
+    position: absolute;
+  }
+  .back {
+    background-color: rgba(255, 255, 255, 0);
+    justify-content: flex-start;
+    align-items: flex-end;
+    bottom: 45px;
+    right: 6px;
+    position: absolute;
+  }
+  .group-1 {
+    top: 280px;
+    flex-direction: column;
+    width: 90%;
+  }
+  .mid {
+    margin-bottom: 9px;
+    font-size: 24px;
+    color: #000000;
+    font-weight: 800;
+  }
+  .bc {
+    position: absolute;
+    width: 192px;
+    height: 490px;
+    top: 0;
+    left: 0;
+    background-color: rgb(47, 52, 116);
+    z-index: -1;
+  }
+  .page1 {
+    position: absolute;
+    background-color: #ffffff;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 490px;
+    top: 0;
+    left: 0;
+    z-index: 10;
+  }
+  .time-bar {
+    width: 192px;
+    height: 35px;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.05);
+    margin-top: 25px;
+  }
+  .time-text {
+    font-size: 18px;
+    color: #666666;
+    text-align: center;
+  }
+  .load {
+    margin-top: 8px;
+    font-size: 24px;
+    color: #000000;
+    font-weight: 800;
+    width: 190px;
+    background-color: rgba(226, 216, 120, 0.267);
+    text-align: center;
+    padding-top: 12px;
+    padding-right: 0;
+    padding-bottom: 12px;
+    padding-left: 0;
+    border-radius: 8px;
+  }
+  .load2 {
+    margin-top: 9px;
+    font-size: 28px;
+    color: #000000;
+    font-weight: 800;
+    width: 85%;
+    text-align: center;
+  }
+  .scroll {
+    height: 405px;
+    text-align: left;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 0;
+    flex: 1;
+    width: 100%;
+  }
+  .scroll-bottom-space {
+    height: 60px;
+  }
+  .save-item {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  .back-btn-wrap {
+    position: absolute;
+    bottom: 0;
+    width: 192px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-color: #333333;
+    border-style: solid;
+  }
+  .back-btn-text {
+    font-size: 26px;
+    color: #333333;
+    text-align: center;
+  }
+</style>

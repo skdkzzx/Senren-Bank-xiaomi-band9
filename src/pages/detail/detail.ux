@@ -1,33 +1,43 @@
 <template>
   <div class="page" onswipe="pageSwipe" onlongpress="displayPage" onclick="playPage">
-    <image class="backgroundimg {{currentBackgroundScaleClass}}" src="{{currentBackground}}" onerror="onImageError('background', currentBackground, $event)"></image>
-    <block if="{{showNextBackground}}">
-      <image class="backgroundimg next-background {{nextBackgroundScaleClass}}" src="{{nextBackground}}" onerror="onImageError('nextBackground', nextBackground, $event)"></image>
-    </block>
-    <block if="{{cgimg}}">
-      <image class="cgimg" src="{{cgimg}}" onerror="onImageError('cg', cgimg, $event)"></image>
-    </block>
-    <block if="{{showNextCg}}">
-      <image class="cgimg next-cg" src="{{nextCg}}" onerror="onImageError('nextCg', nextCg, $event)"></image>
-    </block>
-    <block if="{{characterimg}}">
-      <div class="character-container">
-        <image class="characterimg {{currentCharacterScaleClass}}" src="{{characterimg}}" onerror="onImageError('character', characterimg, $event)"></image>
+    <scroll id="bgScroll" class="bg-scroll" scroll-x="true" scroll-y="{{false}}" bounces="false">
+      <div class="bg-content">
+        <image class="backgroundimg {{currentBackgroundScaleClass}}" src="{{currentBackground}}" onerror="onImageError('background', currentBackground, $event)"></image>
+        <block if="{{showNextBackground}}">
+          <image class="backgroundimg next-background {{nextBackgroundScaleClass}}" src="{{nextBackground}}" onerror="onImageError('nextBackground', nextBackground, $event)"></image>
+        </block>
+        <block if="{{characterimg}}">
+          <div class="character-container">
+            <image class="characterimg {{currentCharacterScaleClass}}" src="{{characterimg}}" onerror="onImageError('character', characterimg, $event)"></image>
+          </div>
+        </block>
+        <block if="{{nextCharacterImg && showNextCharacter}}">
+          <div class="character-container">
+            <image class="characterimg next-character {{nextCharacterScaleClass}}" src="{{nextCharacterImg}}" onerror="onImageError('nextCharacter', nextCharacterImg, $event)"></image>
+          </div>
+        </block>
       </div>
-    </block>
-    <block if="{{nextCharacterImg && showNextCharacter}}">
-      <div class="character-container">
-        <image class="characterimg next-character {{nextCharacterScaleClass}}" src="{{nextCharacterImg}}" onerror="onImageError('nextCharacter', nextCharacterImg, $event)"></image>
-      </div>
+    </scroll>
+    <block if="{{cgimg || showNextCg}}">
+      <scroll id="cgScroll" class="cg-scroll" scroll-x="true" scroll-y="{{false}}" bounces="false">
+        <div class="cg-content" style="width: {{cgContentWidth}}px;">
+          <block if="{{cgimg}}">
+            <image class="cg-image" style="width: {{cgContentWidth}}px; object-fit: {{cgObjectFit}};" src="{{cgimg}}" onerror="onImageError('cg', cgimg, $event)"></image>
+          </block>
+          <block if="{{showNextCg}}">
+            <image class="cg-image next-cg" style="width: {{cgContentWidth}}px; object-fit: {{cgObjectFit}};" src="{{nextCg}}" onerror="onImageError('nextCg', nextCg, $event)"></image>
+          </block>
+        </div>
+      </scroll>
     </block>
     <block if="{{pageShow && !hideText && !isEnding}}">
       <image class="board" src="/pages/detail/board.png" onclick="nextPage"></image>
     </block>
     <block if="{{pageShow && !hideText && !isEnding}}">
-      <text class="character" style="color: {{viewed ? readColor : unreadColor}}; font-weight: {{boldText ? 'bold' : 'normal'}};">{{displayCharacter}}</text>
+      <text class="character" style="color: {{viewed ? readColor : unreadColor}}; font-weight: {{boldText ? 'bold' : 'normal'}}; font-size: {{characterNameFontSize}}px; height: {{characterNameFontSize + 10}}px;">{{displayCharacter}}</text>
     </block>
     <block if="{{!isEnding}}">
-      <scroll id="Scroll" class="scroll2" onclick="nextPage" bounces="true">
+      <scroll id="Scroll" class="scroll2" style="top: {{300 + characterNameFontSize + 14}}px;" scroll-y="{{true}}" onclick="nextPage" bounces="true">
         <block if="{{pageShow && !hideText}}">
           <text class="contect" style="color: {{viewed ? readColor : unreadColor}}; font-size: {{currentTextFontSize}}px; font-weight: {{boldText ? 'bold' : 'normal'}};">{{displayText}}</text>
         </block>
@@ -75,7 +85,7 @@
     </block>
     <block if="{{contrlcenterShow && !isAnimating && !isEnding}}">
       <div class="page1" onswipe="controlCenterSwipe">
-        <scroll id="mainScroll" class="scroll" bounces="true">
+        <scroll id="mainScroll" class="scroll" scroll-y="{{true}}" bounces="true">
           <text class="load2">{{nowTime}} | {{readProgress}}</text>
           <text class="load" onclick="hidecontrlcenter">返回</text>
           <text class="load" onclick="saveconShow">保存</text>
@@ -100,8 +110,8 @@
     </block>
     <block if="{{loadShow && !isAnimating && !isEnding}}">
       <div class="page1" onswipe="loadSaveSwipe">
-        <text class="load3" onclick="loadconShow">点击跳转至对应页面</text>
-        <scroll id="loadScroll" class="scroll" bounces="true">
+        <text class="load3">点击跳转至对应页面</text>
+        <scroll id="loadScroll" class="scroll" scroll-y="{{true}}" bounces="true">
           <block for="{{item in saveSlots}}" tid="index">
             <div class="save-item" onclick="loadSlot(index + 1)">
               <text class="load">存档{{index + 1}}: {{item.text}}</text>
@@ -109,12 +119,15 @@
           </block>
           <text class="load2"></text>
         </scroll>
+        <div class="back-btn-wrap" onclick="loadconShow">
+          <text class="back-btn-text">返回</text>
+        </div>
       </div>
     </block>
     <block if="{{saveShow && !isAnimating && !isEnding}}">
       <div class="page1" onswipe="loadSaveSwipe">
-        <text class="load3" onclick="saveconShow">长按删除存档位</text>
-        <scroll id="saveScroll" class="scroll" bounces="true">
+        <text class="load3">长按删除存档位</text>
+        <scroll id="saveScroll" class="scroll" scroll-y="{{true}}" bounces="true">
           <block for="{{item in saveSlots}}" tid="index">
             <div class="save-item">
               <text class="load" onlongpress="deleteSlot(index + 1)" onclick="saveToSlot(index + 1)">存档{{index + 1}}: {{item.text}}</text>
@@ -125,6 +138,9 @@
           </div>
           <text class="load2"></text>
         </scroll>
+        <div class="back-btn-wrap" onclick="saveconShow">
+          <text class="back-btn-text">返回</text>
+        </div>
       </div>
     </block>
     <block if="{{isEnding && endAnimationDone}}">
@@ -137,85 +153,95 @@
 
 <style>
   .page {
-    background-color: rgb(255, 255, 255);
+    background-color: #000000;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: auto;
-    margin-right: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    width: 336px;
-    height: 480px;
+    width: 192px;
+    height: 490px;
     position: relative;
     overflow: hidden;
   }
+  .bg-scroll {
+    position: absolute;
+    width: 192px;
+    height: 490px;
+    z-index: 1;
+    left: 0;
+    top: 0;
+  }
+  .bg-content {
+    width: 336px;
+    height: 490px;
+  }
   .backgroundimg {
     position: absolute;
-    flex-direction: column;
-    align-items: center;
+    width: 336px;
+    height: 490px;
     object-fit: cover;
-    object-position: center;
-    height: 480px;
-    width: 100%;
-    z-index: 1;
+    object-position: left;
+    left: 0;
+    top: 0;
   }
   .next-background {
     z-index: 1;
   }
   .bg-scale-1 {
-    transform: scale(1, 1) translate(0px, 0px);
+    transform: scale(1) translate(0px, 0px);
   }
   .bg-scale-11 {
-    transform: scale(1.1, 1.1) translate(-20px, -20px);
+    transform: scale(1.1) translate(-11px, -20px);
   }
-  .cgimg {
+  .cg-scroll {
     position: absolute;
-    flex-direction: column;
-    align-items: center;
-    object-fit: cover;
+    width: 192px;
+    height: 490px;
+    z-index: 3;
+  }
+  .cg-content {
+    height: 490px;
+  }
+  .cg-image {
+    position: absolute;
+    height: 490px;
     object-position: center;
-    height: 100%;
-    width: 336px;
-    top: 0;
-    left: 0;
-    z-index: 2;
   }
   .next-cg {
     z-index: 2;
   }
   .character-container {
     position: absolute;
-    justify-content: center;
-    width: 336px;
-    height: 480px;
+    width: 192px;
+    height: 490px;
     overflow-x: hidden;
     overflow-y: hidden;
     top: 0;
     left: 0;
   }
   .characterimg {
-    position: relative;
-    flex: 0 0 auto;
-    height: 100%;
-    z-index: 3;
-    top: 60px;
+    position: absolute;
+    width: 192px;
+    height: 490px;
+    object-fit: contain;
+    z-index: 4;
+    top: 180px;
+    left: 0;
   }
   .next-character {
     z-index: 3;
   }
   .character-scale-07 {
-    transform: scale(0.6, 0.6) translate(50px, 45px);
+    transform: scale(0.5);
   }
   .character-scale-12 {
-    transform: scale(1.2, 1.2) translate(-20px, 15px);
+    transform: scale(0.9);
   }
   .character-scale-1 {
-    transform: scale(1, 1) translate(0px, 40px);
+    transform: scale(0.7);
   }
   .background-mask {
     position: absolute;
-    width: 100%;
+    width: 192px;
     height: 100%;
     top: 0;
     left: 0;
@@ -225,23 +251,25 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 192px;
     height: 100%;
     background-color: #ffffff;
     z-index: 1000;
   }
   .board {
     position: absolute;
-    object-fit: contain;
+    width: 192px;
+    height: 250px;
+    object-fit: fill;
     bottom: 0;
     z-index: 5;
   }
   .character {
     position: absolute;
-    top: 290px;
-    left: 30px;
-    right: 5px;
-    font-size: 24px;
+    top: 300px;
+    left: 17px;
+    right: 3px;
+    font-size: 22px;
     color: #ffffff;
     z-index: 6;
   }
@@ -250,14 +278,14 @@
     justify-content: flex-start;
     align-items: flex-start;
     position: absolute;
-    top: 330px;
     bottom: 0px;
-    left: 15px;
-    right: 15px;
+    left: 9px;
+    right: 9px;
+    padding-top: 4px;
     z-index: 6;
   }
   .contect {
-    font-size: 30px;
+    font-size: 22px;
     font-weight: 100;
     color: #d495d4;
   }
@@ -270,20 +298,20 @@
     max-height: 300px;
     overflow-y: auto;
     z-index: 10;
-    width: 100%;
+    width: 192px;
   }
   .choosetext {
     color: #ffffff;
-    margin-top: 15px;
+    margin-top: 9px;
     background-color: rgba(0, 0, 0, 0.5);
-    padding-top: 4px;
+    padding-top: 5px;
     padding-right: 8px;
-    padding-bottom: 4px;
+    padding-bottom: 5px;
     padding-left: 8px;
-    border-radius: 10px;
-    font-size: 30px;
+    border-radius: 8px;
+    font-size: 22px;
     font-weight: 800;
-    width: 260px;
+    width: 170px;
     box-sizing: border-box;
     text-align: center;
     display: flex;
@@ -294,96 +322,108 @@
   }
   .skip-btn2 {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 15px;
+    right: 11px;
     z-index: 10;
     background-color: rgba(0, 0, 0, 0.5);
-    padding-top: 5px;
-    padding-right: 10px;
-    padding-bottom: 5px;
-    padding-left: 10px;
-    border-radius: 10px;
-    font-size: 24px;
+    padding-top: 4px;
+    padding-right: 8px;
+    padding-bottom: 4px;
+    padding-left: 8px;
+    border-radius: 8px;
+    font-size: 18px;
     color: #ffffff50;
   }
   .skip-btn3 {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 15px;
+    left: 0;
+    width: 192px;
     z-index: 10;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding-top: 5px;
-    padding-right: 10px;
-    padding-bottom: 5px;
-    padding-left: 10px;
-    border-radius: 10px;
-    font-size: 24px;
-    color: #ffffff50;
+    justify-content: center;
+    align-items: center;
   }
   .skip-btn4 {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 15px;
+    left: 0;
+    width: 192px;
     z-index: 10;
-    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+  }
+  .skip-text {
+    font-size: 18px;
     padding-top: 5px;
-    padding-right: 10px;
+    padding-right: 12px;
     padding-bottom: 5px;
-    padding-left: 10px;
-    border-radius: 10px;
-    font-size: 24px;
+    padding-left: 12px;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.7);
     color: #ffffff50;
   }
   .page1 {
     position: absolute;
-    background-color: rgba(255, 255, 255, 0.86);
+    background-color: rgba(255, 255, 255, 0.95);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: auto;
-    margin-right: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    width: 100%;
-    bottom: 0;
+    width: 192px;
+    height: 490px;
     top: 0;
+    left: 0;
     z-index: 20;
   }
+  .info-line {
+    font-size: 30px;
+    margin-top: 12px;
+    font-weight: bold;
+    color: #232525f6;
+    text-align: center;
+  }
   .load {
-    margin-top: 20px;
-    font-size: 35px;
+    margin-top: 15px;
+    font-size: 28px;
     color: #232525f6;
     font-weight: 800;
-    width: 80%;
-    background-color: rgba(250, 233, 187, 0.51);
+    width: 176px;
+    padding-top: 16px;
+    padding-right: 0;
+    padding-bottom: 16px;
+    padding-left: 0;
+    border-radius: 8px;
+    background-color: rgba(226, 216, 120, 0.267);
     text-align: center;
   }
   .load2 {
-    margin-top: 15px;
-    font-size: 35px;
+    margin-top: 13px;
+    font-size: 26px;
     color: #232525f6;
     font-weight: 800;
-    width: 80%;
+    width: 176px;
     text-align: center;
   }
   .load3 {
     margin-top: 20px;
-    font-size: 24px;
+    font-size: 28px;
     color: #232525f6;
-    width: 80%;
+    width: 176px;
+    padding-top: 12px;
+    padding-right: 0;
+    padding-bottom: 12px;
+    padding-left: 0;
     background-color: rgba(250, 233, 187, 0.51);
     text-align: center;
   }
   .scroll {
-    top: 5px;
-    height: 400px;
+    width: 182px;
+    height: 420px;
     text-align: left;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     z-index: 0;
     flex: 1;
-    width: 100%;
   }
   .save-item {
     flex-direction: column;
@@ -398,7 +438,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 192px;
     height: 100%;
     background-color: transparent;
     justify-content: center;
@@ -406,14 +446,89 @@
     z-index: 100;
   }
   .end-text {
-    font-size: 36px;
+    font-size: 21px;
     font-weight: bold;
     color: #000000;
     text-align: center;
+    padding-top: 11px;
+    padding-right: 11px;
+    padding-bottom: 11px;
+    padding-left: 11px;
+  }
+  .back-btn-wrap {
+    position: absolute;
+    bottom: 0;
+    width: 192px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    z-index: 25;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-color: #333333;
+    border-style: solid;
+  }
+  .back-btn-text {
+    font-size: 26px;
+    color: #333333;
+    text-align: center;
+  }
+  .splash-overlay {
+    position: absolute;
+    width: 192px;
+    height: 490px;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 200;
+    justify-content: center;
+    align-items: center;
+  }
+  .splash-box {
+    width: 170px;
+    border-radius: 12px;
     padding-top: 20px;
-    padding-right: 20px;
+    padding-right: 15px;
     padding-bottom: 20px;
-    padding-left: 20px;
+    padding-left: 15px;
+    background-color: #ffffff;
+    flex-direction: column;
+    align-items: center;
+  }
+  .splash-title {
+    font-size: 26px;
+    font-weight: bold;
+    color: #333333;
+    margin-bottom: 15px;
+  }
+  .splash-text {
+    font-size: 20px;
+    color: #666666;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .splash-btn {
+    font-size: 22px;
+    border-radius: 20px;
+    padding-top: 10px;
+    padding-right: 40px;
+    padding-bottom: 10px;
+    padding-left: 40px;
+    background-color: #4caf50;
+    color: #ffffff;
+    margin-top: 15px;
+  }
+  .splash-btn-disabled {
+    font-size: 22px;
+    border-radius: 20px;
+    padding-top: 10px;
+    padding-right: 40px;
+    padding-bottom: 10px;
+    padding-left: 40px;
+    background-color: #cccccc;
+    color: #999999;
+    margin-top: 15px;
   }
 </style>
 
@@ -423,6 +538,7 @@
   import storage from '@system.storage'
   import router from '@system.router'
   import file from '@system.file'
+  import { SETTINGS_CONFIG, DEFAULT_SAVE_SLOTS, MAX_SAVE_SLOTS } from '../../common/config.js'
 
   class GameScriptLoader {
     constructor() {
@@ -696,11 +812,26 @@
       readColor: '#d495d4',
       fontSize: 22,
       currentTextFontSize: 22,
-      textSpeed: 25,
+      characterNameFontSize: 22,
+      textSpeed: 22,
       screenAlwaysOn: true,
       boldText: false,
       skipOnlyRead: false,
       autoPlayDelay: 2000,
+      bgScrollSpeed: 5,
+      bgScrollEnabled: true,
+      bgLeft: 0,
+      bgScrollDir: 1,
+      bgScrollTimer: null,
+      cgLeft: 0,
+      cgScrollDir: 1,
+      cgScrollTimer: null,
+      cgContentWidth: 336,
+      cgObjectFit: 'cover',
+      showSplash: false,
+      splashReady: false,
+      splashCountdown: 5,
+      splashTimer: null,
       pageShow: true,
       viewed: false,
       readProgress: 1,
@@ -1087,6 +1218,102 @@
       }
     },
 
+    startBgScroll() {
+      this.stopBgScroll()
+      this.bgLeft = 0
+      this.bgScrollDir = 1
+      this.bgScrollTimer = setInterval(() => {
+        let speed = this.bgScrollSpeed * 0.184
+        this.bgLeft += this.bgScrollDir * speed
+        if (this.bgLeft <= -144) { this.bgLeft = -144; this.bgScrollDir = 1 }
+        if (this.bgLeft >= 0) { this.bgLeft = 0; this.bgScrollDir = -1 }
+        try {
+          let el = this.$element('bgScroll')
+          if (el) el.scrollTo({ left: Math.abs(this.bgLeft) })
+        } catch (e) {}
+      }, 33)
+    },
+
+    stopBgScroll() {
+      if (this.bgScrollTimer) { clearInterval(this.bgScrollTimer); this.bgScrollTimer = null }
+    },
+
+    startCgScroll() {
+      this.stopCgScroll()
+      if (!this.bgScrollEnabled || !this.cgimg) return
+      this.cgLeft = 0
+      this.cgScrollDir = 1
+      let maxScroll = this.cgContentWidth - 192
+      if (maxScroll <= 0) return
+      this.cgScrollTimer = setInterval(() => {
+        let speed = this.bgScrollSpeed * 0.184
+        this.cgLeft += this.cgScrollDir * speed
+        if (this.cgLeft <= -maxScroll) { this.cgLeft = -maxScroll; this.cgScrollDir = 1 }
+        if (this.cgLeft >= 0) { this.cgLeft = 0; this.cgScrollDir = -1 }
+        try {
+          let el = this.$element('cgScroll')
+          if (el) el.scrollTo({ left: Math.abs(this.cgLeft) })
+        } catch (e) {}
+      }, 33)
+    },
+
+    stopCgScroll() {
+      if (this.cgScrollTimer) { clearInterval(this.cgScrollTimer); this.cgScrollTimer = null }
+    },
+
+    onCgImageComplete(e) {
+      if (e && e.width && e.height) {
+        let isPng = this.cgimg && this.cgimg.includes('.png')
+        if (isPng) {
+          this.cgContentWidth = Math.max(192, Math.ceil(490 * e.width / e.height))
+          this.cgObjectFit = 'contain'
+        } else {
+          this.cgContentWidth = 336
+          this.cgObjectFit = 'cover'
+        }
+      }
+    },
+
+    startSplashCountdown() {
+      storage.get({
+        key: 'splashShown',
+        success: (data) => {
+          if (data === 'true') return
+          this.showSplash = true
+          this.splashReady = false
+          this.splashCountdown = 5
+          this.splashTimer = setInterval(() => {
+            this.splashCountdown--
+            if (this.splashCountdown <= 0) {
+              clearInterval(this.splashTimer)
+              this.splashTimer = null
+              this.splashReady = true
+            }
+          }, 1000)
+        },
+        fail: () => {
+          this.showSplash = true
+          this.splashReady = false
+          this.splashCountdown = 5
+          this.splashTimer = setInterval(() => {
+            this.splashCountdown--
+            if (this.splashCountdown <= 0) {
+              clearInterval(this.splashTimer)
+              this.splashTimer = null
+              this.splashReady = true
+            }
+          }, 1000)
+        }
+      })
+    },
+
+    closeSplash() {
+      if (!this.splashReady) return
+      this.showSplash = false
+      if (this.splashTimer) { clearInterval(this.splashTimer); this.splashTimer = null }
+      storage.set({ key: 'splashShown', value: 'true' })
+    },
+
     cleanupFlashbang() {
       if (this.flashbangTimer) { clearTimeout(this.flashbangTimer); this.flashbangTimer = null }
       if (this.showFlashbang) this.showFlashbang = false
@@ -1299,6 +1526,11 @@
       this.nextCharacterImg = newChar
       this.nextCharacterScaleClass = charScale
       this.nextBackgroundScaleClass = bgScale
+      this.bgLeft = 0
+      this.bgScrollDir = 1
+      this.cgLeft = 0
+      this.cgScrollDir = 1
+      this.startBgScroll()
       if (newBg) this.addToImageCache(newBg, 'background')
       if (newCg) this.addToImageCache(newCg, 'cg')
       if (newChar) this.addToImageCache(newChar, 'character')
@@ -1322,6 +1554,7 @@
           if (this.nextCharacterImg) this.showNextCharacter = true
           this.characterimg = ''
           this.cgimg = ''
+          this.stopCgScroll()
           this.displayCharacter = this.character
           this.displayText = ''
           this.cleanupImagesByPriority(1)
@@ -1344,6 +1577,7 @@
           }
           this.showNextCharacter = false
           this.hideText = false
+          this.startCgScroll()
         }
         this.animationStep++
       } else {
@@ -1364,6 +1598,10 @@
       this.nextCharacterImg = ''
       this.nextCharacterScaleClass = ''
       this.nextBackgroundScaleClass = ''
+      this.bgLeft = 0
+      this.bgScrollDir = 1
+      this.cgLeft = 0
+      this.cgScrollDir = 1
       if (this.isEnding) {
         this.endAnimationDone = true
       } else {
@@ -1629,15 +1867,19 @@
       }, 5000)
       this.currentBackgroundScaleClass = 'bg-scale-1'
       this.currentCharacterScaleClass = 'character-scale-1'
+      this.startSplashCountdown()
     },
 
     onHide() {
       this.stopAutoplay()
       this.stopQuickGo()
       this.stopQuickBack()
+      this.stopBgScroll()
+      this.stopCgScroll()
       if (this.typewriterTimer) clearTimeout(this.typewriterTimer)
       if (this.animationTimer) clearTimeout(this.animationTimer)
       if (this.progressSaveTimer) clearTimeout(this.progressSaveTimer)
+      if (this.splashTimer) { clearInterval(this.splashTimer); this.splashTimer = null }
       this.cleanupFlashbang()
       if (this.readProgress && this.readProgress > 0) {
         try { storage.set({ key: 'readProgress', value: this.readProgress.toString() }) } catch (e) {}
@@ -1657,6 +1899,9 @@
       if (this.backTimer) clearTimeout(this.backTimer)
       if (this.animationTimer) clearTimeout(this.animationTimer)
       if (this.progressSaveTimer) clearTimeout(this.progressSaveTimer)
+      if (this.splashTimer) { clearInterval(this.splashTimer); this.splashTimer = null }
+      this.stopBgScroll()
+      this.stopCgScroll()
       this.cleanupFlashbang()
       if (Object.keys(this.pendingSaves).length > 0) this.savePendingBlocks()
       this.readBlocks = {}
@@ -1699,16 +1944,7 @@
 
     async loadAllSettings() {
       return new Promise((resolve) => {
-        let settings = [
-          { key: 'textSpeedSetting', prop: 'textSpeed', type: 'number' },
-          { key: 'fontSizeSetting', prop: 'fontSize', type: 'number' },
-          { key: 'unreadColorSetting', prop: 'unreadColor', type: 'string' },
-          { key: 'readColorSetting', prop: 'readColor', type: 'string' },
-          { key: 'screenAlwaysOnSetting', prop: 'screenAlwaysOn', type: 'boolean' },
-          { key: 'boldTextSetting', prop: 'boldText', type: 'boolean' },
-          { key: 'skipOnlyReadSetting', prop: 'skipOnlyRead', type: 'boolean' },
-          { key: 'autoPlayDelaySetting', prop: 'autoPlayDelay', type: 'number' }
-        ]
+        let settings = SETTINGS_CONFIG
         let count = 0
         settings.forEach(({ key, prop, type }) => {
           storage.get({

@@ -95,7 +95,9 @@
       </div>
     </block>
     <block if="{{jump || (lhuishow && cguishow)}}">
-      <image class="back-btn" src="/common/back.png" onclick="back"></image>
+      <div class="back-btn-wrap" onclick="back">
+        <text class="back-btn-text">返回</text>
+      </div>
     </block>
   </div>
 </template>
@@ -122,16 +124,17 @@
     justify-content: flex-start;
     align-items: center;
     z-index: 1;
-    width: 336px;
-    height: 480px;
+    width: 192px;
+    height: 490px;
     position: absolute;
     top: 0;
     left: 0;
+    overflow: hidden;
   }
   .bcg {
     position: absolute;
-    width: 336px;
-    height: 480px;
+    width: 192px;
+    height: 490px;
     top: 0;
     left: 0;
     z-index: -1;
@@ -149,27 +152,29 @@
   }
   .character {
     position: absolute;
-    top: 20px;
-    left: 30px;
+    top: 65px;
+    left: 98px;
+    width: 140px;
+    height: 360px;
+    object-fit: contain;
     z-index: 3;
-    transform: scale(0.8, 0.8);
   }
   .backgroundimg {
     position: absolute;
     width: 336px;
-    height: 480px;
+    height: 490px;
     top: 0;
     left: 0;
     object-fit: cover;
     z-index: 2;
   }
   .info-text {
-    font-size: 16px;
+    font-size: 22px;
     color: #c0c0c0;
     text-align: center;
   }
   .mid {
-    font-size: 35px;
+    font-size: 28px;
     color: #000000;
     font-weight: 800;
   }
@@ -229,7 +234,7 @@
     z-index: 10;
   }
   .startText {
-    font-size: 28px;
+    font-size: 24px;
     color: #333333;
     font-weight: 600;
     letter-spacing: 2px;
@@ -238,25 +243,40 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    margin-top: 20px;
+    width: 192px;
+    margin-top: 8px;
     margin-right: 0;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     margin-left: 0;
     position: relative;
     z-index: 10;
   }
   .title {
-    font-size: 36px;
+    font-size: 30px;
     color: #ebebeb;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
   }
-  .back-btn {
+  .back-btn-wrap {
     position: absolute;
-    left: 15px;
-    top: 15px;
+    bottom: 0;
+    width: 192px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
     z-index: 20;
+    background-color: rgba(255, 255, 255, 0.85);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-color: #333333;
+    border-style: solid;
+  }
+  .back-btn-text {
+    font-size: 26px;
+    color: #333333;
+    text-align: center;
   }
   .content {
     flex-direction: column;
