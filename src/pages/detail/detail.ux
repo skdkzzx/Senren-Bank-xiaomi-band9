@@ -1189,6 +1189,7 @@
     },
 
     startBgScroll() {
+      if (!this.bgScrollEnabled) return
       this.stopBgScroll()
       this.bgLeft = 0
       this.bgScrollDir = 1
@@ -1632,13 +1633,9 @@
     async nextQuickPage() {
       console.log('nextQuickPage called, isGoing:', this.isGoing, 'readProgress:', this.readProgress)
       if (this.isTyping) {
-        if (this.skipOnlyRead && !(await this.isPageRead(this.readProgress))) {
-          console.log('Stopping: skipOnlyRead and page not read')
-          this.stopQuickGo(); return
-        }
         this.completeSkipTyping()
       }
-      if (!this.skipOnlyRead) await this.markPageAsRead(this.readProgress)
+      await this.markPageAsRead(this.readProgress)
       let end = this.checkEndPage(this.readProgress)
       if (end) { this.triggerEndSequence(end); return }
       let hidden = this.checkHiddenPage(this.readProgress)
@@ -1657,10 +1654,6 @@
       }
       if (this.choose) { console.log('Stopping: choose page'); this.stopQuickGo(); return }
       this.readProgress++
-      if (this.skipOnlyRead && !(await this.isPageRead(this.readProgress))) {
-        console.log('Stopping: skipOnlyRead and next page not read')
-        this.stopQuickGo(); return
-      }
       await this.saveOnBlockTransition(this.readProgress)
       await this.loadQuickPage(this.readProgress)
       this.scheduleNextQuickPage()
