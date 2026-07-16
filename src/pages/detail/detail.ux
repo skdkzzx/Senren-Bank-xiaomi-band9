@@ -44,13 +44,13 @@
 
     <!-- 控制按钮 -->
     <div class="skip-btn2" if="{{isAutoing && !contrlcenterShow && !isAnimating && !isEnding}}" onclick="stopAutoplay">
-      <text>停止自动播放</text>
+      <text class="skip-text">停止自动播放</text>
     </div>
     <div class="skip-btn3" if="{{isGoing && !contrlcenterShow && !isAnimating && !isEnding}}" onclick="stopQuickGo">
-      <text>停止快进</text>
+      <text class="skip-text">停止快进</text>
     </div>
     <div class="skip-btn4" if="{{isBacking && !contrlcenterShow && !isAnimating && !isEnding}}" onclick="stopQuickBack">
-      <text>停止快退</text>
+      <text class="skip-text">停止快退</text>
     </div>
 
     <!-- 选择选项 -->
@@ -65,7 +65,8 @@
     <!-- 控制中心 -->
     <div class="page1" if="{{contrlcenterShow && !isAnimating && !isEnding}}" onswipe="controlCenterSwipe">
       <scroll id="mainScroll" class="scroll" scroll-y="{{true}}" bounces="{{true}}">
-        <text class="load2">{{nowTime}} | {{readProgress}}</text>
+        <text class="info-line">{{nowTime}}</text>
+        <text class="info-line">进度: {{readProgress}}</text>
         <text class="load" onclick="hidecontrlcenter">返回</text>
         <text class="load" onclick="saveconShow">保存</text>
         <text class="load" onclick="loadconShow">加载</text>
@@ -74,9 +75,17 @@
         <text class="load" onclick="indexRoute">返回主页</text>
         <text class="load" onclick="settingsRoute">设置</text>
         <text class="load" onclick="lctRoute">流程图</text>
+        <text class="load" onclick="toggleBgScroll">{{bgScrollEnabled ? '关闭背景滚动' : '开启背景滚动'}}</text>
         <text class="load" onclick="autoplay" if="{{!isBacking && !isGoing}}">{{isAutoing ? '停止自动播放' : '自动播放'}}</text>
+        <text class="load" onclick="goPrevText" if="{{readProgress > 1}}">回到上一文本</text>
         <text class="load" onclick="quickgo" if="{{!isBacking && !isAutoing}}">{{isGoing ? '停止快进' : '快进'}}</text>
         <text class="load" onclick="quickback" if="{{!isAutoing && !isGoing}}">{{isBacking ? '停止快退' : '快退'}}</text>
+        <text class="load" onclick="nextScene">下一个场景</text>
+        <text class="load" onclick="prevScene">上一个场景</text>
+        <text class="load" onclick="nextChapter">下一个章节</text>
+        <text class="load" onclick="prevChapter">上一个章节</text>
+        <text class="load" onclick="nextChoice">下一选择项</text>
+        <text class="load" onclick="prevChoice">上一选择项</text>
         <text class="load2"></text>
       </scroll>
     </div>
@@ -295,41 +304,33 @@
     right: 11px;
     z-index: 10;
     background-color: rgba(0, 0, 0, 0.5);
-    padding-top: 4px;
-    padding-right: 8px;
-    padding-bottom: 4px;
-    padding-left: 8px;
+    padding: 4px 8px;
     border-radius: 8px;
-    font-size: 18px;
-    color: #ffffff50;
   }
   .skip-btn3 {
     position: absolute;
     top: 15px;
     left: 0;
     width: 192px;
-    z-index: 10;
+    flex-direction: row;
     justify-content: center;
-    align-items: center;
+    z-index: 10;
   }
   .skip-btn4 {
     position: absolute;
     top: 15px;
     left: 0;
     width: 192px;
-    z-index: 10;
+    flex-direction: row;
     justify-content: center;
-    align-items: center;
+    z-index: 10;
   }
   .skip-text {
     font-size: 18px;
-    padding-top: 5px;
-    padding-right: 12px;
-    padding-bottom: 5px;
-    padding-left: 12px;
-    border-radius: 6px;
+    color: #ffffff;
     background-color: rgba(0, 0, 0, 0.7);
-    color: #ffffff50;
+    padding: 5px 12px;
+    border-radius: 6px;
   }
   .page1 {
     position: absolute;
@@ -507,7 +508,7 @@
   import storage from '@system.storage'
   import router from '@system.router'
   import file from '@system.file'
-  import { SETTINGS_CONFIG, DEFAULT_SAVE_SLOTS, MAX_SAVE_SLOTS } from '../../common/config.js'
+  import { SETTINGS_CONFIG, DEFAULT_SAVE_SLOTS, MAX_SAVE_SLOTS, CHAPTERS_LIST, CHOICE_PAGES } from '../../common/config.js'
 
   class GameScriptLoader {
     constructor() {
@@ -788,7 +789,7 @@
       skipOnlyRead: false,
       autoPlayDelay: 2000,
       bgScrollSpeed: 5,
-      bgScrollEnabled: true,
+      bgScrollEnabled: false,
       bgLeft: 0,
       bgScrollDir: 1,
       bgScrollTimer: null,
@@ -1620,7 +1621,7 @@
         if (this.skipOnlyRead && !(await this.isPageRead(this.readProgress))) {
           this.stopQuickGo(); return
         }
-        this.skipTyping()
+        this.completeSkipTyping()
       }
       if (!this.skipOnlyRead) await this.markPageAsRead(this.readProgress)
       let end = this.checkEndPage(this.readProgress)
@@ -2353,6 +2354,141 @@
     },
 
     hidecontrlcenter() {
+      this.contrlcenterShow = false
+    },
+
+    toggleBgScroll() {
+      this.bgScrollEnabled = !this.bgScrollEnabled
+      if (this.bgScrollEnabled) { this.startBgScroll() }
+      else { this.stopBgScroll() }
+      this.contrlcenterShow = false
+    },
+
+    goPrevText() {
+      if (this.readProgress <= 1) return
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      this.readProgress--
+      this.loadPage(this.readProgress)
+      this.contrlcenterShow = false
+    },
+
+    async nextScene() {
+      if (this.choose) { prompt.showToast({ message: '请先完成选择', duration: 1500 }); return }
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      const ge = this.gameEngine
+      const curBg = ge ? (ge.scripts[this.readProgress.toString()] || {}).b : ''
+      if (!ge || !curBg) {
+        this.readProgress = Math.min(this.readProgress + 1, 69000)
+        this.loadPage(this.readProgress)
+        this.contrlcenterShow = false
+        return
+      }
+      for (let i = this.readProgress + 1; i <= 69000; i++) {
+        const key = i.toString()
+        if (!ge.scripts[key]) {
+          const chunk = Math.ceil(i / ge.chunkSize)
+          if (!ge.loadedChunks[chunk]) await ge.loadMinimalChunk(chunk)
+        }
+        const s = ge.scripts[key]
+        if (s && s.b && s.b !== curBg) {
+          this.readProgress = i
+          this.loadPage(this.readProgress)
+          this.contrlcenterShow = false
+          return
+        }
+      }
+      prompt.showToast({ message: '已是最后', duration: 1500 })
+      this.contrlcenterShow = false
+    },
+
+    async prevScene() {
+      if (this.choose) { prompt.showToast({ message: '请先完成选择', duration: 1500 }); return }
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      const ge = this.gameEngine
+      const curBg = ge ? (ge.scripts[this.readProgress.toString()] || {}).b : ''
+      if (!ge || !curBg) {
+        this.readProgress = Math.max(this.readProgress - 1, 1)
+        this.loadPage(this.readProgress)
+        this.contrlcenterShow = false
+        return
+      }
+      for (let i = this.readProgress - 1; i >= 1; i--) {
+        const key = i.toString()
+        if (!ge.scripts[key]) {
+          const chunk = Math.ceil(i / ge.chunkSize)
+          if (!ge.loadedChunks[chunk]) await ge.loadMinimalChunk(chunk)
+        }
+        const s = ge.scripts[key]
+        if (s && s.b && s.b !== curBg) {
+          this.readProgress = i
+          this.loadPage(this.readProgress)
+          this.contrlcenterShow = false
+          return
+        }
+      }
+      prompt.showToast({ message: '已是最初', duration: 1500 })
+      this.contrlcenterShow = false
+    },
+
+    nextChapter() {
+      if (this.choose) { prompt.showToast({ message: '请先完成选择', duration: 1500 }); return }
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      const chapters = CHAPTERS_LIST
+      let next = chapters.find(c => c > this.readProgress)
+      if (!next) next = chapters[0]
+      this.readProgress = next
+      this.loadPage(this.readProgress)
+      this.contrlcenterShow = false
+    },
+
+    prevChapter() {
+      if (this.choose) { prompt.showToast({ message: '请先完成选择', duration: 1500 }); return }
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      const chapters = CHAPTERS_LIST
+      let prev = [...chapters].reverse().find(c => c < this.readProgress)
+      if (!prev) prev = chapters[chapters.length - 1]
+      this.readProgress = prev
+      this.loadPage(this.readProgress)
+      this.contrlcenterShow = false
+    },
+
+    nextChoice() {
+      if (this.choose) { prompt.showToast({ message: '请先完成选择', duration: 1500 }); return }
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      const next = CHOICE_PAGES.find(c => c > this.readProgress)
+      if (next) {
+        this.readProgress = next
+        this.loadPage(this.readProgress)
+      } else {
+        prompt.showToast({ message: '已是最后选择项', duration: 1500 })
+      }
+      this.contrlcenterShow = false
+    },
+
+    prevChoice() {
+      if (this.choose) { prompt.showToast({ message: '请先完成选择', duration: 1500 }); return }
+      this.stopAutoplay()
+      this.stopQuickGo()
+      this.stopQuickBack()
+      const prev = [...CHOICE_PAGES].reverse().find(c => c < this.readProgress)
+      if (prev) {
+        this.readProgress = prev
+        this.loadPage(this.readProgress)
+      } else {
+        prompt.showToast({ message: '已是最初选择项', duration: 1500 })
+      }
       this.contrlcenterShow = false
     },
 
