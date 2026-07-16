@@ -1589,12 +1589,14 @@
     },
 
     quickgo() {
+      console.log('quickgo called, isGoing:', this.isGoing)
       if (this.isGoing) this.stopQuickGo()
       else this.startQuickGo()
       this.contrlcenterShow = false
     },
 
     startQuickGo() {
+      console.log('startQuickGo called')
       this.toTop()
       this.stopAutoplay()
       this.stopQuickBack()
@@ -1606,19 +1608,32 @@
     },
 
     stopQuickGo() {
+      console.log('stopQuickGo called, stack trace:', new Error().stack)
       this.isGoing = false
       if (this.goTimer) clearTimeout(this.goTimer)
     },
 
     scheduleNextQuickPage() {
-      if (!this.isGoing) return
+      if (!this.isGoing) {
+        console.log('scheduleNextQuickPage: not going, returning')
+        return
+      }
       if (this.goTimer) clearTimeout(this.goTimer)
-      this.goTimer = setTimeout(() => { if (this.isGoing) this.nextQuickPage() }, this.quickSpeed)
+      this.goTimer = setTimeout(() => {
+        if (this.isGoing) {
+          console.log('Timer fired, calling nextQuickPage')
+          this.nextQuickPage()
+        } else {
+          console.log('Timer fired but isGoing is false')
+        }
+      }, this.quickSpeed)
     },
 
     async nextQuickPage() {
+      console.log('nextQuickPage called, isGoing:', this.isGoing, 'readProgress:', this.readProgress)
       if (this.isTyping) {
         if (this.skipOnlyRead && !(await this.isPageRead(this.readProgress))) {
+          console.log('Stopping: skipOnlyRead and page not read')
           this.stopQuickGo(); return
         }
         this.completeSkipTyping()
@@ -1640,9 +1655,10 @@
         await this.loadQuickPage(this.readProgress)
         this.scheduleNextQuickPage(); return
       }
-      if (this.choose) { this.stopQuickGo(); return }
+      if (this.choose) { console.log('Stopping: choose page'); this.stopQuickGo(); return }
       this.readProgress++
       if (this.skipOnlyRead && !(await this.isPageRead(this.readProgress))) {
+        console.log('Stopping: skipOnlyRead and next page not read')
         this.stopQuickGo(); return
       }
       await this.saveOnBlockTransition(this.readProgress)
