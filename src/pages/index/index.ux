@@ -1,63 +1,35 @@
 <template>
   <div class="page" onswipe="loadpageProccess">
-    <block if="{{uishow}}">
-      <image class="background" src="{{bg}}" onclick="hidui"></image>
-    </block>
-    <block if="{{uishow}}">
-      <image class="logo" src="/pages/index/deactivelogo.png"></image>
-    </block>
-    <block if="{{uishow}}">
-      <image class="about" src="/pages/index/info.png" onclick="about"></image>
-    </block>
-    <block if="{{uishow}}">
-      <image class="settings" src="/pages/index/settings.png" onclick="settings"></image>
-    </block>
+    <image class="background" src="/common/title_bg.jpg" if="{{uishow}}"></image>
+    <image class="logo" src="deactivelogo.png" if="{{uishow}}"></image>
+
+    <image class="about" src="info.png" onclick="about" if="{{uishow}}"></image>
+    <image class="settings" src="settings.png" onclick="settings" if="{{uishow}}"></image>
+
     <div class="group-1">
-      <block if="{{uishow}}">
-        <text class="mid" onclick="start">开始游戏</text>
-      </block>
-      <block if="{{uishow}}">
-        <text class="mid" onclick="lastStart">继续上次</text>
-      </block>
-      <block if="{{uishow}}">
-        <text class="mid" onclick="loadProccess">读取存档</text>
-      </block>
-      <block if="{{uishow}}">
-        <text class="mid" onclick="more">更多</text>
-      </block>
+      <text class="mid" onclick="start" if="{{uishow}}">开始游戏</text>
+      <text class="mid" onclick="lastStart" if="{{uishow}}">继续上次</text>
+      <text class="mid" onclick="loadProccess" if="{{uishow}}">读取存档</text>
+      <text class="mid" onclick="more" if="{{uishow}}">更多</text>
     </div>
-    <block if="{{!uishow}}">
-      <image class="bc" src="/common/bcgi/空_夕空.jpg"></image>
-    </block>
-    <block if="{{!uishow}}">
-      <image class="reset2" src="/common/reset.png" onclick="reset"></image>
-    </block>
-    <block if="{{!uishow}}">
-      <image class="background2" src="{{bg}}" onclick="hidui"></image>
-    </block>
-    <block if="{{uishow}}">
-      <image class="reset" src="/common/reset.png" onclick="reset"></image>
-    </block>
-    <block if="{{uishow}}">
-      <image class="back" src="/common/go.png" onclick="die"></image>
-    </block>
-    <block if="{{loadShow}}">
-      <div class="page1">
-        <div class="time-bar">
-          <text class="time-text">{{currentTime}}</text>
-        </div>
-        <scroll id="mainScroll" class="scroll" scroll-y="{{true}}" bounces="true">
-          <div class="save-item" for="{{(index, item) in saveSlots}}" onclick="loadSlot(index + 1)">
-            <text class="load">存档{{index + 1}}: {{item.text}}</text>
-          </div>
-          <div class="scroll-bottom-space"></div>
-          <text class="load2"></text>
-        </scroll>
-        <div class="back-btn-wrap" onclick="unloadProccess">
-          <text class="back-btn-text">返回</text>
-        </div>
+
+    <image class="back" src="/common/go.png" onclick="die" if="{{uishow}}"></image>
+
+    <div class="page1" if="{{loadShow}}">
+      <div class="time-bar">
+        <text class="time-text">{{currentTime}}</text>
       </div>
-    </block>
+      <scroll id="mainScroll" class="scroll" scroll-y="{{true}}" bounces="true">
+        <div class="save-item" for="{{(index, item) in saveSlots}}" onclick="loadSlot(index + 1)">
+          <text class="load">存档{{index + 1}}: {{item.text}}</text>
+        </div>
+        <div class="scroll-bottom-space"></div>
+        <text class="load2"></text>
+      </scroll>
+      <div class="back-btn-wrap" onclick="unloadProccess">
+        <text class="back-btn-text">返回</text>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -82,24 +54,7 @@
       maxSaveSlots: 30,
       loadShow: false,
       loading: false,
-      bgIndex: 0,
-      bgList: [
-        '/common/title_bg0.jpg',
-        '/common/title_bg1.jpg',
-        '/common/title_bg2.jpg',
-        '/common/title_bg3.jpg',
-        '/common/title_bg4.jpg',
-        '/common/title_bg5.jpg',
-        '/common/title_bg6.jpg',
-        '/common/title_bg7.jpg',
-        '/common/title_bg8.jpg'
-      ],
-      bg: '/common/title_bg0.jpg',
       firstLaunchChecked: false
-    },
-    back() {},
-    loadingp() {
-      this.loading = !this.loading
     },
     hidui() {
       this.uishow = !this.uishow
@@ -115,21 +70,6 @@
     async onShow() {
       this.checkFirstLaunch()
       this.updateTime()
-      storage.get({
-        key: 'bg',
-        success: (data) => {
-          let index = parseInt(data)
-          if (!isNaN(index) && index >= 0 && index < this.bgList.length) {
-            this.bgIndex = index
-          } else {
-            this.bgIndex = 0
-          }
-          this.updateBackground()
-        },
-        fail: () => {
-          this.updateBackground()
-        }
-      })
       storage.get({
         key: 'readProgress',
         success: (data) => {
@@ -183,20 +123,6 @@
       } catch (e) {
         console.error('加载存档时出错:', e)
       }
-    },
-    reset() {
-      this.bgIndex = (this.bgIndex + 1) % this.bgList.length
-      this.updateBackground()
-      storage.set({
-        key: 'bg',
-        value: String(this.bgIndex),
-        success: () => {},
-        fail: () => {}
-      })
-    },
-    updateBackground() {
-      let index = this.bgIndex % this.bgList.length
-      this.bg = this.bgList[index]
     },
     loadSlot(slot) {
       storage.get({
@@ -304,6 +230,7 @@
     top: 187px;
     position: absolute;
     width: 170px;
+    height: 100px;
     object-fit: contain;
     z-index: 3;
   }
@@ -314,34 +241,12 @@
     object-fit: cover;
     z-index: 1;
   }
-  .background2 {
-    top: 130px;
-    position: absolute;
-    width: 192px;
-    object-fit: cover;
-  }
-  .reset2 {
-    background-color: rgba(255, 255, 255, 0);
-    justify-content: flex-start;
-    align-items: flex-end;
-    bottom: 15px;
-    right: 25px;
-    position: absolute;
-  }
   .settings {
     background-color: rgba(255, 255, 255, 0);
     justify-content: flex-start;
     align-items: flex-end;
     top: 15px;
     right: 22px;
-    position: absolute;
-  }
-  .reset {
-    background-color: rgba(255, 255, 255, 0);
-    justify-content: flex-start;
-    align-items: flex-end;
-    bottom: 130px;
-    right: 6px;
     position: absolute;
   }
   .back {
@@ -362,15 +267,6 @@
     font-size: 24px;
     color: #000000;
     font-weight: 800;
-  }
-  .bc {
-    position: absolute;
-    width: 192px;
-    height: 490px;
-    top: 0;
-    left: 0;
-    background-color: rgb(47, 52, 116);
-    z-index: -1;
   }
   .page1 {
     position: absolute;

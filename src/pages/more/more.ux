@@ -1,355 +1,258 @@
 <template>
   <div class="page">
-    <image class="bcg" src="/common/bcgi/空_夕空.jpg"></image>
-    <image class="bt" src="/common/bt.png"></image>
-    <image class="hd" src="/common/hd.png"></image>
-    <block if="{{!showAS}}">
-      <scroll id="mainScroll" class="scroll" scroll-y="{{true}}">
-        <div class="header">
-          <text class="title">更多</text>
-        </div>
-        <div class="content" onclick="lctruote">
-          <text class="mid">流程图</text>
-        </div>
-        <div class="content" onclick="cgruote">
-          <text class="mid">鉴赏模式</text>
-        </div>
-        <div class="content" onclick="afterstoryshow">
-          <text class="mid">后日谈</text>
-        </div>
-      </scroll>
-    </block>
-    <block if="{{showAS}}">
-      <div class="page1">
-        <image class="bcg" src="/common/bcgi/空_夕空.jpg"></image>
-        <image class="bt" src="/common/bt.png"></image>
-        <image class="hd" src="/common/hd.png"></image>
-        <block if="{{character == 1}}">
-          <div class="page2">
-            <image class="cig" src="/common/cimg/fn05_1.png"></image>
-            <div class="header">
-              <text class="title">后日谈</text>
-            </div>
-            <text class="mid1">芳乃</text>
-            <div class="startBtn">
-              <text class="startText" onclick="loadStart(18291)">开始</text>
-            </div>
-          </div>
-        </block>
-        <block if="{{character == 2}}">
-          <div class="page2">
-            <image class="cig" src="/common/cimg/mz06_1.png"></image>
-            <div class="header">
-              <text class="title">后日谈</text>
-            </div>
-            <text class="mid1">茉子</text>
-            <div class="startBtn">
-              <text class="startText" onclick="loadStart(27530)">开始</text>
-            </div>
-          </div>
-        </block>
-        <block if="{{character == 3}}">
-          <div class="page2">
-            <image class="cig" src="/common/cimg/cy02_1.png"></image>
-            <div class="header">
-              <text class="title">后日谈</text>
-            </div>
-            <text class="mid1">丛雨</text>
-            <div class="startBtn">
-              <text class="startText" onclick="loadStart(38391)">开始</text>
-            </div>
-          </div>
-        </block>
-        <block if="{{character == 4}}">
-          <div class="page2">
-            <image class="cig" src="/common/cimg/ln01_1.png"></image>
-            <div class="header">
-              <text class="title">后日谈</text>
-            </div>
-            <text class="mid1">蕾娜</text>
-            <div class="startBtn">
-              <text class="startText" onclick="loadStart(48184)">开始</text>
-            </div>
-          </div>
-        </block>
-        <block if="{{character == 5}}">
-          <div class="page2">
-            <image class="cig" src="/common/cimg/xc02_1.png"></image>
-            <div class="header">
-              <text class="title">后日谈</text>
-            </div>
-            <text class="mid1">小春</text>
-            <div class="startBtn">
-              <text class="startText" onclick="loadStart(53483)">开始</text>
-            </div>
-          </div>
-        </block>
-        <block if="{{character == 6}}">
-          <div class="page2">
-            <image class="cig" src="/common/cimg/lh01_1.png"></image>
-            <div class="header">
-              <text class="title">后日谈</text>
-            </div>
-            <text class="mid1">芦花</text>
-            <div class="startBtn">
-              <text class="startText" onclick="loadStart(55422)">开始</text>
-            </div>
-          </div>
-        </block>
-        <image class="last-btn" src="/common/back.png" onclick="last"></image>
-        <image class="enter-btn" src="/common/go.png" onclick="enter"></image>
+    <img class="bcg" src="/common/bcgi/空_夕空.jpg"></img>
+    <img class="bt" src="/common/bt.png"></img>
+    <img class="hd" src="/common/hd.png"></img>
+
+    <scroll id="mainScroll" class="scroll" scroll-y="{{true}}" if="{{!showAS}}">
+      <div class="header">
+        <text class="title">更多</text>
       </div>
-    </block>
+      <div class="content" onclick="lctruote">
+        <text class="mid">流程图</text>
+      </div>
+      <div class="content" onclick="cgruote">
+        <text class="mid">鉴赏模式</text>
+      </div>
+      <div class="content" onclick="afterstoryshow">
+        <text class="mid">后日谈</text>
+      </div>
+    </scroll>
+
+    <div class="page1" if="{{showAS}}">
+      <img class="bcg" src="/common/bcgi/空_夕空.jpg"></img>
+      <img class="bt" src="/common/bt.png"></img>
+      <img class="hd" src="/common/hd.png"></img>
+
+      <div class="header">
+        <text class="title">后日谈</text>
+      </div>
+
+      <swiper class="as-swiper" index="{{asIndex}}" indicator="false" loop="true" onchange="onSwiperChange">
+        <div class="as-page" for="{{afterStories}}" tid="name">
+          <image class="cig" src="{{$item.img}}"></image>
+          <text class="mid1">{{$item.name}}</text>
+          <div class="startBtn">
+            <text class="startText" onclick="loadStart($item.line)">开始</text>
+          </div>
+        </div>
+      </swiper>
+    </div>
+
+    <!-- 返回按钮 -->
     <div class="back-btn-wrap" onclick="back">
       <text class="back-btn-text">返回</text>
     </div>
   </div>
 </template>
 
-<style>
-  .page {
-    background-color: #bbbbbb;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    width: 192px;
-    height: 490px;
-    position: relative;
-    overflow: hidden;
-  }
-  .page1 {
-    background-color: #bbbbbb;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    flex: 1;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-  }
-  .page2 {
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    width: 192px;
-    height: 490px;
-    padding-top: 20px;
-    padding-right: 20px;
-    padding-bottom: 20px;
-    padding-left: 20px;
-    box-sizing: border-box;
-  }
-  .bcg {
-    position: absolute;
-    width: 192px;
-    height: 490px;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    object-fit: cover;
-  }
-  .cig {
-    position: absolute;
-    top: 50px;
-    left: 6px;
-    width: 180px;
-    height: 450px;
-    object-fit: contain;
-    z-index: -1;
-  }
-  .bt {
-    position: absolute;
-    bottom: 0;
-    width: 192px;
-    z-index: 5;
-  }
-  .hd {
-    position: absolute;
-    top: 0;
-    width: 192px;
-    z-index: 5;
-  }
-  .scroll {
-    width: 180px;
-    height: 420px;
-    text-align: left;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    z-index: 2;
-    flex: 1;
-    margin-top: 11px;
-  }
-  .header {
-    width: 192px;
-    justify-content: center;
-    align-items: center;
-    margin-top: 11px;
-    margin-right: 0;
-    margin-bottom: 10px;
-    margin-left: 0;
-    z-index: 10;
-  }
-  .title {
-    font-size: 30px;
-    color: #ebebeb;
-    font-weight: bold;
-  }
-  .content {
-    flex-direction: column;
-    align-items: center;
-    width: 174px;
-    background-color: rgba(255, 255, 255, 0.73);
-    border-radius: 9px;
-    padding-top: 10px;
-    padding-right: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
-    border-top-color: #e0e0e0;
-    border-right-color: #e0e0e0;
-    border-bottom-color: #e0e0e0;
-    border-left-color: #e0e0e0;
-    border-style: solid;
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-    margin-top: 9px;
-    margin-right: 9px;
-    margin-bottom: 9px;
-    margin-left: 9px;
-  }
-  .mid {
-    font-size: 28px;
-    color: #000000;
-    font-weight: 800;
-  }
-  .mid1 {
-    text-align: center;
-    display: flex;
-    width: 192px;
-    background-color: #fff6e6;
-    font-size: 32px;
-    color: #645f15;
-    font-weight: 800;
-    position: absolute;
-    bottom: 70px;
-  }
-  .startBtn {
-    position: absolute;
-    bottom: 23px;
-    margin-top: 60px;
-    padding-top: 10px;
-    padding-right: 40px;
-    padding-bottom: 10px;
-    padding-left: 40px;
-    background-color: rgba(255, 255, 255, 0.85);
-    border-radius: 30px;
-    border-top-color: #ffffff;
-    border-right-color: #ffffff;
-    border-bottom-color: #ffffff;
-    border-left-color: #ffffff;
-    border-style: solid;
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);
-  }
-  .startText {
-    font-size: 20px;
-    color: #333333;
-    font-weight: 600;
-    letter-spacing: 1px;
-  }
-  .last-btn {
-    position: absolute;
-    left: 15px;
-    bottom: 15px;
-  }
-  .enter-btn {
-    position: absolute;
-    right: 15px;
-    bottom: 15px;
-  }
-  .back-btn-wrap {
-    position: absolute;
-    bottom: 0;
-    width: 192px;
-    height: 50px;
-    justify-content: center;
-    align-items: center;
-    z-index: 20;
-    background-color: rgba(255, 255, 255, 0.85);
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-    border-color: #333333;
-    border-style: solid;
-  }
-  .back-btn-text {
-    font-size: 26px;
-    color: #333333;
-    text-align: center;
-  }
-</style>
-
 <script>
-  import storage from '@system.storage'
-  import router from '@system.router'
+import storage from '@system.storage'
+import router from '@system.router'
 
-  export default {
-    data: {
-      showAS: false,
-      character: 1
-    },
-    last() {
-      if (this.character > 1) {
-        this.character -= 1
-      } else if (this.character == 1) {
-        this.character = 6
-      }
-    },
-    enter() {
-      if (this.character < 6) {
-        this.character += 1
-      } else if (this.character == 6) {
-        this.character = 1
-      }
-    },
-    back() {
-      if (this.showAS) {
-        this.showAS = false
-      } else {
-        router.back({ uri: 'pages/index' })
-      }
-    },
-    lctruote() {
-      router.push({ uri: 'pages/lct' })
-    },
-    cgruote() {
-      router.push({ uri: 'pages/cgs' })
-    },
-    afterstoryshow() {
-      this.showAS = true
-    },
-    async loadStart(progress) {
-      try {
-        await new Promise((resolve, reject) => {
-          storage.set({
-            key: 'readProgress',
-            value: progress.toString(),
-            success: resolve,
-            fail: reject
-          })
-        })
-        console.log('进度设置成功')
-        router.push({ uri: 'pages/detail' })
-      } catch (e) {
-        console.error('进度设置失败:', e)
-      }
+export default {
+  data: {
+    showAS: false,
+    asIndex: 0,
+    afterStories: [
+      { name: '芳乃', img: '/common/cimg/fn05_1.png', line: 18291 },
+      { name: '茉子', img: '/common/cimg/mz06_1.png', line: 27530 },
+      { name: '丛雨', img: '/common/cimg/cy02_1.png', line: 38391 },
+      { name: '蕾娜', img: '/common/cimg/ln01_1.png', line: 48184 },
+      { name: '小春', img: '/common/cimg/xc02_1.png', line: 53483 },
+      { name: '芦花', img: '/common/cimg/lh01_1.png', line: 55422 }
+    ]
+  },
+
+  onSwiperChange(e) {
+    this.asIndex = e.index
+  },
+
+  back() {
+    if (!this.showAS) {
+      router.back({ uri: 'pages/index' })
+    } else {
+      this.showAS = false
     }
+  },
+
+  lctruote() {
+    router.push({ uri: 'pages/lct' })
+  },
+
+  cgruote() {
+    router.push({ uri: 'pages/cgs' })
+  },
+
+  afterstoryshow() {
+    this.showAS = true
+  },
+
+  loadStart(a) {
+    storage.set({
+      key: 'readProgress',
+      value: a.toString(),
+      success: () => {},
+      fail: () => {}
+    })
+    router.replace({ uri: 'pages/detail' })
   }
+}
 </script>
+
+<style>
+.page {
+  flex-direction: column;
+  align-items: center;
+  width: 192px;
+  height: 490px;
+  background-color: #bbbbbb;
+  overflow: hidden;
+}
+
+.bcg {
+  position: absolute;
+  width: 192px;
+  height: 490px;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  object-fit: cover;
+}
+
+.bt {
+  position: absolute;
+  bottom: 0;
+  width: 192px;
+  z-index: 5;
+}
+
+.hd {
+  position: absolute;
+  top: 0;
+  width: 192px;
+  z-index: 5;
+}
+
+.page1 {
+  flex-direction: column;
+  align-items: center;
+  width: 192px;
+  height: 490px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.as-swiper {
+  width: 192px;
+  height: 400px;
+}
+
+.as-page {
+  flex-direction: column;
+  align-items: center;
+  width: 192px;
+  height: 400px;
+}
+
+.cig {
+  position: absolute;
+  top: 50px;
+  left: 6px;
+  width: 180px;
+  height: 450px;
+  object-fit: contain;
+  z-index: -1;
+}
+
+.header {
+  width: 192px;
+  justify-content: center;
+  align-items: center;
+  margin: 11px 0;
+  z-index: 10;
+}
+
+.title {
+  font-size: 30px;
+  color: #ebebeb;
+  font-weight: bold;
+}
+
+.scroll {
+  width: 180px;
+  height: 420px;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.content {
+  width: 174px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.726);
+  border-radius: 9px;
+  border: 1px solid #e0e0e0;
+  margin: 9px;
+}
+
+.mid {
+  font-size: 28px;
+  color: #000;
+  font-weight: 800;
+}
+
+.mid1 {
+  text-align: center;
+  width: 192px;
+  background-color: #fff6e6;
+  font-size: 32px;
+  color: #645f15;
+  font-weight: 800;
+  position: absolute;
+  bottom: 70px;
+}
+
+.startBtn {
+  position: absolute;
+  bottom: 23px;
+  left: 0;
+  width: 192px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 0;
+  border: 1px solid #ffffff;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);
+}
+
+.startText {
+  font-size: 20px;
+  color: #333;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.back-btn-wrap {
+  position: absolute;
+  bottom: 0;
+  width: 192px;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 2px solid #333333;
+}
+
+.back-btn-text {
+  font-size: 26px;
+  color: #333333;
+  text-align: center;
+}
+</style>

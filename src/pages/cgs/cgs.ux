@@ -1,463 +1,502 @@
 <template>
   <div class="page">
-    <image class="bcg" src="/common/bcgi/空_夕空.jpg"></image>
-    <image class="bt" src="/common/bt.png"></image>
-    <image class="hd" src="/common/hd.png"></image>
-    <block if="{{jump}}">
-      <div class="page2">
-        <div class="header">
-          <text class="title">鉴赏模式</text>
-        </div>
-        <div class="content" onclick="showcg">
-          <text class="mid">CG鉴赏</text>
-        </div>
-        <div class="content" onclick="showlh">
-          <text class="mid">立绘鉴赏</text>
-        </div>
+    <img class="bcg" src="/common/bcgi/空_夕空.jpg"></img>
+    <img class="bt" src="/common/bt.png"></img>
+    <img class="hd" src="/common/hd.png"></img>
+
+    <!-- 主菜单 -->
+    <div class="page2" if="{{jump === true}}">
+      <div class="header header-menu">
+        <text class="title">鉴赏模式</text>
       </div>
-    </block>
-    <block if="{{cgshow}}">
-      <div class="page2">
+      <div class="content" onclick="showcg">
+        <text class="mid">CG鉴赏</text>
+      </div>
+      <div class="content" onclick="showlh">
+        <text class="mid">立绘鉴赏</text>
+      </div>
+    </div>
+
+    <!-- CG鉴赏页面 -->
+    <div class="page2" if="{{cgshow === true}}">
+      <scroll class="cgscroll" scroll-x="true" scroll-y="false" bounces="false">
         <image class="cgimg" src="{{currentCG}}" onclick="hidcgui"></image>
-        <block if="{{cguishow}}">
-          <image class="bt" src="/common/bt.png"></image>
-        </block>
-        <block if="{{cguishow}}">
-          <image class="hd" src="/common/hd.png"></image>
-        </block>
-        <div class="header">
-          <block if="{{cguishow}}">
-            <text class="title">CG鉴赏</text>
-          </block>
-        </div>
-        <div class="info-container">
-          <block if="{{cguishow}}">
-            <text class="info-text">{{cgIndex + 1}}/{{cgList.length}}</text>
-          </block>
-        </div>
-        <block if="{{cguishow}}">
-          <image class="last-btn" src="/common/back.png" onclick="lastcg"></image>
-        </block>
-        <block if="{{cguishow}}">
-          <image class="enter-btn" src="/common/go.png" onclick="entercg"></image>
-        </block>
+      </scroll>
+      <img class="bt" src="/common/bt.png" if="{{cguishow}}"></img>
+      <img class="hd" src="/common/hd.png" if="{{cguishow}}"></img>
+      <div class="header">
+        <text class="title" if="{{cguishow}}">CG鉴赏</text>
       </div>
-    </block>
-    <block if="{{lhshow}}">
-      <div class="page2">
-        <image class="backgroundimg" src="{{currentBg}}" onclick="hidlhch"></image>
-        <block if="{{lhchshow}}">
-          <image class="character" src="{{currentChar}}" onclick="hidlhui"></image>
-        </block>
-        <block if="{{lhuishow}}">
-          <image class="bt" src="/common/bt.png"></image>
-        </block>
-        <block if="{{lhuishow}}">
-          <image class="hd" src="/common/hd.png"></image>
-        </block>
-        <div class="header">
-          <block if="{{lhuishow}}">
-            <text class="title">立绘鉴赏</text>
-          </block>
-        </div>
-        <block if="{{lhuishow}}">
-          <div class="info-container">
-            <text class="info-text">背景: {{bgIndex + 1}}/{{backgroundList.length}}</text>
-            <text class="info-text">角色: {{charIndex + 1}}/{{characterList.length}}</text>
-          </div>
-        </block>
-        <block if="{{lhuishow}}">
-          <image class="last-btn1" src="/common/back.png" onclick="lastcgb"></image>
-        </block>
-        <block if="{{lhuishow}}">
-          <image class="enter-btn1" src="/common/go.png" onclick="entercgb"></image>
-        </block>
-        <block if="{{lhuishow}}">
-          <image class="last-btn" src="/common/back.png" onclick="lastlh"></image>
-        </block>
-        <block if="{{lhuishow}}">
-          <image class="enter-btn" src="/common/go.png" onclick="enterlh"></image>
-        </block>
+
+      <div class="info-container" if="{{cguishow}}">
+        <text class="info-text">{{cgIndex + 1}}/{{cgList.length}}</text>
       </div>
-    </block>
-    <block if="{{sceneshow}}">
-      <div class="page2">
-        <image class="bt" src="/common/bt.png"></image>
-        <image class="hd" src="/common/hd.png"></image>
-        <div class="header">
-          <text class="title">场景鉴赏</text>
+
+      <div class="btn-container" if="{{cguishow}}">
+        <div class="nav-btn" onclick="clickLastCG" onlongpress="startLastCG">
+          <img src="/common/back.png"></img>
         </div>
-        <image class="last-btn" src="/common/back.png" onclick="lastsc"></image>
-        <image class="enter-btn" src="/common/go.png" onclick="entersc"></image>
-        <div class="startBtn">
-          <text class="startText" onclick="loadStart">开始</text>
+        <div class="nav-btn" onclick="clickNextCG" onlongpress="startNextCG">
+          <img src="/common/go.png"></img>
         </div>
       </div>
-    </block>
-    <block if="{{jump || (lhuishow && cguishow)}}">
-      <div class="back-btn-wrap" onclick="back">
-        <text class="back-btn-text">返回</text>
+    </div>
+
+    <!-- 立绘鉴赏页面 -->
+    <div class="page2" if="{{lhshow === true}}">
+      <scroll class="lhscroll" scroll-x="true" scroll-y="false" bounces="false">
+        <div class="lhcontent">
+          <image class="backgroundimg" src="{{currentBg}}" onclick="hidlhch"></image>
+          <image class="character" src="{{currentChar}}" onclick="hidlhui" if="{{lhchshow}}"></image>
+        </div>
+      </scroll>
+      <img class="bt" src="/common/bt.png" if="{{lhuishow}}"></img>
+      <img class="hd" src="/common/hd.png" if="{{lhuishow}}"></img>
+      <div class="header">
+        <text class="title" if="{{lhuishow}}">立绘鉴赏</text>
       </div>
-    </block>
+      <div class="info-container" if="{{lhuishow}}">
+        <text class="info-text">背景: {{bgIndex + 1}}/{{backgroundList.length}}</text>
+        <text class="info-text">角色: {{charIndex + 1}}/{{characterList.length}}</text>
+      </div>
+      <div class="btn-container" if="{{lhuishow}}">
+        <div class="nav-btn" onclick="clickLastBg" onlongpress="startLastBg">
+          <img src="/common/back.png"></img>
+        </div>
+        <div class="nav-btn" onclick="clickNextBg" onlongpress="startNextBg">
+          <img src="/common/go.png"></img>
+        </div>
+        <div class="nav-btn" onclick="clickLastChar" onlongpress="startLastChar">
+          <img src="/common/back.png"></img>
+        </div>
+        <div class="nav-btn" onclick="clickNextChar" onlongpress="startNextChar">
+          <img src="/common/go.png"></img>
+        </div>
+      </div>
+    </div>
+
+    <div class="back-btn-wrap" if="{{jump || (cgshow && cguishow) || (lhshow && lhuishow)}}" onclick="back">
+      <text class="back-btn-text">返回</text>
+    </div>
   </div>
 </template>
 
-<style>
-  .page {
-    background-color: #bbbbbb;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-  .info-container {
-    position: absolute;
-    flex-direction: column;
-    align-items: center;
-    bottom: 20px;
-  }
-  .page2 {
-    background-color: rgba(187, 187, 187, 0);
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    z-index: 1;
-    width: 192px;
-    height: 490px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-  }
-  .bcg {
-    position: absolute;
-    width: 192px;
-    height: 490px;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    object-fit: cover;
-  }
-  .cgimg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    object-fit: contain;
-    background-color: #000000;
-    z-index: 1;
-  }
-  .character {
-    position: absolute;
-    top: 65px;
-    left: 98px;
-    width: 140px;
-    height: 360px;
-    object-fit: contain;
-    z-index: 3;
-  }
-  .backgroundimg {
-    position: absolute;
-    width: 336px;
-    height: 490px;
-    top: 0;
-    left: 0;
-    object-fit: cover;
-    z-index: 2;
-  }
-  .info-text {
-    font-size: 22px;
-    color: #c0c0c0;
-    text-align: center;
-  }
-  .mid {
-    font-size: 28px;
-    color: #000000;
-    font-weight: 800;
-  }
-  .bt {
-    position: absolute;
-    bottom: 0;
-    z-index: 10;
-  }
-  .hd {
-    position: absolute;
-    top: 0;
-    z-index: 10;
-  }
-  .last-btn {
-    position: absolute;
-    left: 15px;
-    bottom: 15px;
-    z-index: 10;
-  }
-  .enter-btn {
-    position: absolute;
-    right: 15px;
-    bottom: 15px;
-    z-index: 10;
-  }
-  .last-btn1 {
-    position: absolute;
-    left: 15px;
-    bottom: 100px;
-    z-index: 10;
-  }
-  .enter-btn1 {
-    position: absolute;
-    right: 15px;
-    bottom: 100px;
-    z-index: 10;
-  }
-  .startBtn {
-    position: absolute;
-    bottom: 15px;
-    padding-top: 15px;
-    padding-right: 40px;
-    padding-bottom: 15px;
-    padding-left: 40px;
-    background-color: rgba(255, 255, 255, 0.85);
-    border-radius: 30px;
-    border-top-color: #ffffff;
-    border-right-color: #ffffff;
-    border-bottom-color: #ffffff;
-    border-left-color: #ffffff;
-    border-style: solid;
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-  }
-  .startText {
-    font-size: 24px;
-    color: #333333;
-    font-weight: 600;
-    letter-spacing: 2px;
-  }
-  .header {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 192px;
-    margin-top: 8px;
-    margin-right: 0;
-    margin-bottom: 10px;
-    margin-left: 0;
-    position: relative;
-    z-index: 10;
-  }
-  .title {
-    font-size: 30px;
-    color: #ebebeb;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-  }
-  .back-btn-wrap {
-    position: absolute;
-    bottom: 0;
-    width: 192px;
-    height: 50px;
-    justify-content: center;
-    align-items: center;
-    z-index: 20;
-    background-color: rgba(255, 255, 255, 0.85);
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-    border-color: #333333;
-    border-style: solid;
-  }
-  .back-btn-text {
-    font-size: 26px;
-    color: #333333;
-    text-align: center;
-  }
-  .content {
-    flex-direction: column;
-    align-items: center;
-    width: 90%;
-    background-color: rgba(255, 255, 255, 0.73);
-    border-radius: 15px;
-    padding-top: 10px;
-    padding-right: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
-    border-top-color: #e0e0e0;
-    border-right-color: #e0e0e0;
-    border-bottom-color: #e0e0e0;
-    border-left-color: #e0e0e0;
-    border-style: solid;
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-    margin-top: 15px;
-    margin-right: 15px;
-    margin-bottom: 15px;
-    margin-left: 15px;
-    z-index: 2;
-  }
-</style>
-
 <script>
-  import file from '@system.file'
-  import router from '@system.router'
+import router from '@system.router'
+import storage from '@system.storage'
 
-  export default {
-    data: {
-      jump: true,
-      cgshow: false,
-      lhshow: false,
-      sceneshow: false,
-      cgList: [],
-      characterList: [],
-      backgroundList: [],
-      cgIndex: 0,
-      charIndex: 0,
-      bgIndex: 0,
-      currentCG: '',
-      currentChar: '',
-      currentBg: '',
-      cguishow: true,
-      lhchshow: true,
-      lhuishow: true,
-      loadingConfig: false,
-      configLoaded: false
-    },
-    onInit() {
-      console.log('鉴赏页面初始化')
-      this.loadImageConfig()
-    },
-    loadImageConfig() {
-      if (this.configLoaded || this.loadingConfig) return
-      this.loadingConfig = true
-      let filePath = '/common/image-config.txt'
-      console.log('尝试读取路径:', filePath)
-      file.readText({
-        uri: filePath,
-        success: (data) => {
-          try {
-            let text = typeof data === 'string' ? data : (data.text || '')
-            let config = JSON.parse(text)
-            this.cgList = config.cg || []
-            this.characterList = config.characters || []
-            this.backgroundList = config.backgrounds || []
-            this.initImages()
-            this.configLoaded = true
-            console.log(`配置加载成功，CG: ${this.cgList.length}, 立绘: ${this.characterList.length}, 背景: ${this.backgroundList.length}`)
-          } catch (e) {
-            console.error('解析 JSON 失败:', e)
-            this.initImages()
-          }
-          this.loadingConfig = false
-        },
-        fail: (err) => {
-          console.error('读取失败:', err)
-          this.initImages()
-          this.loadingConfig = false
+export default {
+  data: {
+    jump: true,
+    cgshow: false,
+    lhshow: false,
+
+    cgList: [
+      "/common/evig/ev001a.jpg","/common/evig/ev001b.jpg","/common/evig/ev001c.jpg","/common/evig/ev011a.jpg","/common/evig/ev021a.jpg","/common/evig/ev021b.jpg","/common/evig/ev021c.jpg","/common/evig/ev021d.jpg","/common/evig/ev021f.jpg","/common/evig/ev031a.jpg","/common/evig/ev031b.jpg","/common/evig/ev041a.jpg","/common/evig/ev051a.jpg","/common/evig/ev051b.jpg","/common/evig/ev101a.jpg","/common/evig/ev101b.jpg","/common/evig/ev102a.jpg","/common/evig/ev103a.jpg","/common/evig/ev104a.jpg","/common/evig/ev105.jpg","/common/evig/ev105m.jpg","/common/evig/ev106a.jpg","/common/evig/ev106b.jpg","/common/evig/ev106c.jpg","/common/evig/ev106e.jpg","/common/evig/ev107a.jpg","/common/evig/ev108a.jpg","/common/evig/ev108b.jpg","/common/evig/ev109a.jpg","/common/evig/ev110a.jpg","/common/evig/ev111a.jpg","/common/evig/ev151a.jpg","/common/evig/ev151b.jpg","/common/evig/ev151c.jpg","/common/evig/ev152a.jpg","/common/evig/ev152c.jpg","/common/evig/ev152d.jpg","/common/evig/ev152e.jpg","/common/evig/ev152f.jpg","/common/evig/ev153a.jpg","/common/evig/ev153b.jpg","/common/evig/ev153c.jpg","/common/evig/ev153d.jpg","/common/evig/ev153e.jpg","/common/evig/ev153h.jpg","/common/evig/ev154a.jpg","/common/evig/ev154b.jpg","/common/evig/ev154d.jpg","/common/evig/ev154f.jpg","/common/evig/ev154g.jpg","/common/evig/ev154h.jpg","/common/evig/ev154j.jpg","/common/evig/ev155a.jpg","/common/evig/ev155b.jpg","/common/evig/ev155c.jpg","/common/evig/ev155d.jpg","/common/evig/ev155e.jpg","/common/evig/ev155f.jpg","/common/evig/ev156a.jpg","/common/evig/ev156b.jpg","/common/evig/ev156c.jpg","/common/evig/ev156d.jpg","/common/evig/ev157a.jpg","/common/evig/ev157b.jpg","/common/evig/ev157c.jpg","/common/evig/ev157d.jpg","/common/evig/ev158a.jpg","/common/evig/ev158b.jpg","/common/evig/ev158c.jpg","/common/evig/ev158d.jpg","/common/evig/ev158e.jpg","/common/evig/ev158f.jpg","/common/evig/ev158h.jpg","/common/evig/ev159a.jpg","/common/evig/ev159b.jpg","/common/evig/ev160a.jpg","/common/evig/ev160b.jpg","/common/evig/ev160c.jpg","/common/evig/ev160d.jpg","/common/evig/ev160e.jpg","/common/evig/ev201a.jpg","/common/evig/ev201b.jpg","/common/evig/ev202a.jpg","/common/evig/ev202b.jpg","/common/evig/ev202c.jpg","/common/evig/ev203a.jpg","/common/evig/ev203b.jpg","/common/evig/ev203c.jpg","/common/evig/ev204a.jpg","/common/evig/ev204b.jpg","/common/evig/ev204c.jpg","/common/evig/ev205a.jpg","/common/evig/ev206a.jpg","/common/evig/ev207a.jpg","/common/evig/ev208a.jpg","/common/evig/ev208b.jpg","/common/evig/ev209a.jpg","/common/evig/ev210a.jpg","/common/evig/ev251a.jpg","/common/evig/ev251b.jpg","/common/evig/ev252a.jpg","/common/evig/ev252b.jpg","/common/evig/ev252c.jpg","/common/evig/ev252d.jpg","/common/evig/ev252e.jpg","/common/evig/ev252f.jpg","/common/evig/ev253a.jpg","/common/evig/ev253b.jpg","/common/evig/ev253c.jpg","/common/evig/ev253e.jpg","/common/evig/ev253f.jpg","/common/evig/ev253g.jpg","/common/evig/ev254a.jpg","/common/evig/ev254c.jpg","/common/evig/ev254d.jpg","/common/evig/ev254e.jpg","/common/evig/ev255b.jpg","/common/evig/ev255c.jpg","/common/evig/ev255d.jpg","/common/evig/ev256b.jpg","/common/evig/ev256c.jpg","/common/evig/ev256d.jpg","/common/evig/ev257b.jpg","/common/evig/ev257c.jpg","/common/evig/ev257d.jpg","/common/evig/ev257e.jpg","/common/evig/ev257f.jpg","/common/evig/ev258a.jpg","/common/evig/ev258b.jpg","/common/evig/ev258d.jpg","/common/evig/ev258f.jpg","/common/evig/ev259b.jpg","/common/evig/ev259c.jpg","/common/evig/ev259d.jpg","/common/evig/ev259e.jpg","/common/evig/ev260a.jpg","/common/evig/ev260b.jpg","/common/evig/ev260c.jpg","/common/evig/ev261a.jpg","/common/evig/ev261b.jpg","/common/evig/ev261c.jpg","/common/evig/ev261d.jpg","/common/evig/ev261e.jpg","/common/evig/ev301a.jpg","/common/evig/ev301b.jpg","/common/evig/ev302a.jpg","/common/evig/ev303b.jpg","/common/evig/ev303c.jpg","/common/evig/ev303g.jpg","/common/evig/ev304a.jpg","/common/evig/ev305.jpg","/common/evig/ev306a.jpg","/common/evig/ev307a.jpg","/common/evig/ev308a.jpg","/common/evig/ev308b.jpg","/common/evig/ev308d.jpg","/common/evig/ev308e.jpg","/common/evig/ev309a.jpg","/common/evig/ev309e.jpg","/common/evig/ev310.jpg","/common/evig/ev311.jpg","/common/evig/ev312.jpg","/common/evig/ev312b.jpg","/common/evig/ev312c.jpg","/common/evig/ev351a.jpg","/common/evig/ev351b.jpg","/common/evig/ev351c.jpg","/common/evig/ev351d.jpg","/common/evig/ev351e.jpg","/common/evig/ev351g.jpg","/common/evig/ev351h.jpg","/common/evig/ev351i.jpg","/common/evig/ev352a.jpg","/common/evig/ev352b.jpg","/common/evig/ev352c.jpg","/common/evig/ev353a.jpg","/common/evig/ev354a.jpg","/common/evig/ev354b.jpg","/common/evig/ev354c.jpg","/common/evig/ev354d.jpg","/common/evig/ev354e.jpg","/common/evig/ev354f.jpg","/common/evig/ev354g.jpg","/common/evig/ev354h.jpg","/common/evig/ev355a.jpg","/common/evig/ev355b.jpg","/common/evig/ev355d.jpg","/common/evig/ev355f.jpg","/common/evig/ev355v.jpg","/common/evig/ev356a.jpg","/common/evig/ev356b.jpg","/common/evig/ev356c.jpg","/common/evig/ev357a.jpg","/common/evig/ev357b.jpg","/common/evig/ev357c.jpg","/common/evig/ev357d.jpg","/common/evig/ev357e.jpg","/common/evig/ev358a.jpg","/common/evig/ev358b.jpg","/common/evig/ev358c.jpg","/common/evig/ev359a.jpg","/common/evig/ev359b.jpg","/common/evig/ev360a.jpg","/common/evig/ev360b.jpg","/common/evig/ev360c.jpg","/common/evig/ev360d.jpg","/common/evig/ev360e.jpg","/common/evig/ev401a.jpg","/common/evig/ev401b.jpg","/common/evig/ev401c.jpg","/common/evig/ev401d.jpg","/common/evig/ev402a.jpg","/common/evig/ev402b.jpg","/common/evig/ev402c.jpg","/common/evig/ev403a.jpg","/common/evig/ev404a.jpg","/common/evig/ev404b.jpg","/common/evig/ev405s.jpg","/common/evig/ev406a.jpg","/common/evig/ev407g.jpg","/common/evig/ev407h.jpg","/common/evig/ev407l.jpg","/common/evig/ev408a.jpg","/common/evig/ev408b.jpg","/common/evig/ev408c.jpg","/common/evig/ev409_a.jpg","/common/evig/ev409_b.jpg","/common/evig/ev409a.jpg","/common/evig/ev409b.jpg","/common/evig/ev410a.jpg","/common/evig/ev411a.jpg","/common/evig/ev411b.jpg","/common/evig/ev451a.jpg","/common/evig/ev451b.jpg","/common/evig/ev452a.jpg","/common/evig/ev452b.jpg","/common/evig/ev452d.jpg","/common/evig/ev452e.jpg","/common/evig/ev452f.jpg","/common/evig/ev452g.jpg","/common/evig/ev453a.jpg","/common/evig/ev453b.jpg","/common/evig/ev453c.jpg","/common/evig/ev453d.jpg","/common/evig/ev454a.jpg","/common/evig/ev454b.jpg","/common/evig/ev454c.jpg","/common/evig/ev454d.jpg","/common/evig/ev454e.jpg","/common/evig/ev454f.jpg","/common/evig/ev455a.jpg","/common/evig/ev455b.jpg","/common/evig/ev455c.jpg","/common/evig/ev455d.jpg","/common/evig/ev456a.jpg","/common/evig/ev456b.jpg","/common/evig/ev456c.jpg","/common/evig/ev456d.jpg","/common/evig/ev457a.jpg","/common/evig/ev457b.jpg","/common/evig/ev457c.jpg","/common/evig/ev457d.jpg","/common/evig/ev457e.jpg","/common/evig/ev457f.jpg","/common/evig/ev458a.jpg","/common/evig/ev458b.jpg","/common/evig/ev458c.jpg","/common/evig/ev458e.jpg","/common/evig/ev458f.jpg","/common/evig/ev459a.jpg","/common/evig/ev459b.jpg","/common/evig/ev459c.jpg","/common/evig/ev460a.jpg","/common/evig/ev460b.jpg","/common/evig/ev460c.jpg","/common/evig/ev460e.jpg","/common/evig/ev501a.jpg","/common/evig/ev501c.jpg","/common/evig/ev502a.jpg","/common/evig/ev502b.jpg","/common/evig/ev502c.jpg","/common/evig/ev503a.jpg","/common/evig/ev503b.jpg","/common/evig/ev503c.jpg","/common/evig/ev503d.jpg","/common/evig/ev503e.jpg","/common/evig/ev504a.jpg","/common/evig/ev504b.jpg","/common/evig/ev504c.jpg","/common/evig/ev504d.jpg","/common/evig/ev504e.jpg","/common/evig/ev505a.jpg","/common/evig/ev505b.jpg","/common/evig/ev505c.jpg","/common/evig/ev505d.jpg","/common/evig/ev506a.jpg","/common/evig/ev506b.jpg","/common/evig/ev507a.jpg","/common/evig/ev507b.jpg","/common/evig/ev507c.jpg","/common/evig/ev507d.jpg","/common/evig/ev508a.jpg","/common/evig/ev509a.jpg","/common/evig/ev509b.jpg","/common/evig/ev509c.jpg","/common/evig/ev509d.jpg","/common/evig/ev509e.jpg","/common/evig/ev510a.jpg","/common/evig/ev510b.jpg","/common/evig/ev510c.jpg","/common/evig/ev601a.jpg","/common/evig/ev601b.jpg","/common/evig/ev601c.jpg","/common/evig/ev602a.jpg","/common/evig/ev602b.jpg","/common/evig/ev602c.jpg","/common/evig/ev602d.jpg","/common/evig/ev602e.jpg","/common/evig/ev602f.jpg","/common/evig/ev603a.jpg","/common/evig/ev603b.jpg","/common/evig/ev603c.jpg","/common/evig/ev603d.jpg","/common/evig/ev603e.jpg","/common/evig/ev603f.jpg","/common/evig/ev603g.jpg","/common/evig/ev604a.jpg","/common/evig/ev604b.jpg","/common/evig/ev604c.jpg","/common/evig/ev604d.jpg","/common/evig/ev604e.jpg","/common/evig/ev605a.jpg","/common/evig/ev605c.jpg","/common/evig/ev605d.jpg","/common/evig/ev605e.jpg","/common/evig/ev605f.jpg","/common/evig/ev606a.jpg","/common/evig/ev606c.jpg","/common/evig/ev606d.jpg","/common/evig/ev606e.jpg","/common/evig/ev607a.jpg","/common/evig/ev607b.jpg","/common/evig/ev607c.jpg","/common/evig/ev607d.jpg","/common/evig/ev607e.jpg","/common/evig/ev608a.jpg","/common/evig/ev608b.jpg","/common/evig/ev608c.jpg","/common/evig/ev608d.jpg","/common/evig/ev609a.jpg","/common/evig/ev609b.jpg","/common/evig/ev609c.jpg","/common/evig/ev609d.jpg","/common/evig/ev609e.jpg","/common/evig/ev610a.jpg","/common/evig/ev999.jpg","/common/evig/演出_ライト1.jpg","/common/evig/演出_ライト2.jpg","/common/evig/演出_ライト3.jpg"
+    ],
+    cgIndex: 0,
+    currentCG: '',
+
+    characterList: [
+      "/common/cimg/hz01_1.png","/common/cimg/hz01_2.png","/common/cimg/hz01_3.png","/common/cimg/hz02_1.png","/common/cimg/hz02_2.png","/common/cimg/hz02_3.png","/common/cimg/hz03_1.png","/common/cimg/hz03_2.png","/common/cimg/hz03_3.png","/common/cimg/hz04_1.png","/common/cimg/hz04_2.png","/common/cimg/hz04_3.png","/common/cimg/hz05_1.png","/common/cimg/hz05_2.png","/common/cimg/hz05_3.png","/common/cimg/hz06_1.png","/common/cimg/hz06_2.png","/common/cimg/hz06_3.png","/common/cimg/hz07_1.png","/common/cimg/hz07_2.png","/common/cimg/hz07_3.png","/common/cimg/hz08_1.png","/common/cimg/hz08_2.png","/common/cimg/hz08_3.png","/common/cimg/hz09_1.png","/common/cimg/hz09_2.png","/common/cimg/hz09_3.png","/common/cimg/hz10_1.png","/common/cimg/hz10_2.png","/common/cimg/hz10_3.png","/common/cimg/hz11_1.png","/common/cimg/hz11_2.png","/common/cimg/hz11_3.png","/common/cimg/hz13_1.png","/common/cimg/hz13_2.png","/common/cimg/hz13_3.png","/common/cimg/hz15_1.png","/common/cimg/hz15_2.png","/common/cimg/hz15_3.png","/common/cimg/hz17_1.png","/common/cimg/hz17_2.png","/common/cimg/hz17_3.png","/common/cimg/hz19_1.png","/common/cimg/hz19_2.png","/common/cimg/hz19_3.png","/common/cimg/j01_1.png","/common/cimg/j02_2.png","/common/cimg/llz01_1.png","/common/cimg/llz01_2.png","/common/cimg/llz01_3.png","/common/cimg/llz02_1.png","/common/cimg/llz02_2.png","/common/cimg/llz02_3.png","/common/cimg/llz03_1.png","/common/cimg/llz03_2.png","/common/cimg/llz03_3.png","/common/cimg/llz04_1.png","/common/cimg/llz04_2.png","/common/cimg/llz04_3.png","/common/cimg/llz05_1.png","/common/cimg/llz05_2.png","/common/cimg/llz05_3.png","/common/cimg/llz06_1.png","/common/cimg/llz06_2.png","/common/cimg/llz06_3.png","/common/cimg/llz07_1.png","/common/cimg/llz07_2.png","/common/cimg/llz07_3.png","/common/cimg/llz08_1.png","/common/cimg/llz08_2.png","/common/cimg/llz08_3.png","/common/cimg/llz09_1.png","/common/cimg/llz09_2.png","/common/cimg/llz09_3.png","/common/cimg/mg01_1.png","/common/cimg/mg02_2.png","/common/cimg/mj01_1.png","/common/cimg/mj01_2.png","/common/cimg/mj01_3.png","/common/cimg/mj02_1.png","/common/cimg/mj02_2.png","/common/cimg/mj02_3.png","/common/cimg/mj03_1.png","/common/cimg/mj03_2.png","/common/cimg/mj03_3.png","/common/cimg/mj04_1.png","/common/cimg/mj04_2.png","/common/cimg/mj04_3.png","/common/cimg/mj05_1.png","/common/cimg/mj05_2.png","/common/cimg/mj05_3.png","/common/cimg/nyh01_1.png","/common/cimg/nyh01_2.png","/common/cimg/nyh01_3.png","/common/cimg/nyh02_1.png","/common/cimg/nyh02_2.png","/common/cimg/nyh02_3.png","/common/cimg/nyh03_1.png","/common/cimg/nyh03_2.png","/common/cimg/nyh03_3.png","/common/cimg/nyh04_1.png","/common/cimg/nyh04_2.png","/common/cimg/nyh04_3.png","/common/cimg/nyh05_1.png","/common/cimg/nyh05_2.png","/common/cimg/nyh05_3.png","/common/cimg/qhz.png","/common/cimg/qllz.png","/common/cimg/qmj.png","/common/cimg/qnyh.png","/common/cimg/qwz.png","/common/cimg/qxy.png","/common/cimg/qxz.png","/common/cimg/qyw.png","/common/cimg/wz01_1.png","/common/cimg/wz01_2.png","/common/cimg/wz02_1.png","/common/cimg/wz02_2.png","/common/cimg/wz03_1.png","/common/cimg/wz03_2.png","/common/cimg/wz04_1.png","/common/cimg/wz04_2.png","/common/cimg/wz05_1.png","/common/cimg/wz05_2.png","/common/cimg/wz06_1.png","/common/cimg/wz06_2.png","/common/cimg/wz07_1.png","/common/cimg/wz07_2.png","/common/cimg/wz08_1.png","/common/cimg/wz08_2.png","/common/cimg/x01_1.png","/common/cimg/x02_2.png","/common/cimg/xz01_1.png","/common/cimg/xz01_2.png","/common/cimg/xz01_3.png","/common/cimg/xz02_1.png","/common/cimg/xz02_2.png","/common/cimg/xz02_3.png","/common/cimg/xz03_1.png","/common/cimg/xz03_2.png","/common/cimg/xz03_3.png","/common/cimg/xz04_1.png","/common/cimg/xz04_2.png","/common/cimg/xz04_3.png","/common/cimg/xz05_1.png","/common/cimg/xz05_2.png","/common/cimg/xz05_3.png","/common/cimg/xz06_1.png","/common/cimg/xz06_2.png","/common/cimg/xz06_3.png","/common/cimg/xz07_1.png","/common/cimg/xz07_2.png","/common/cimg/xz07_3.png","/common/cimg/xz08_1.png","/common/cimg/xz08_2.png","/common/cimg/xz08_3.png","/common/cimg/xz09_1.png","/common/cimg/xz09_2.png","/common/cimg/xz09_3.png","/common/cimg/xz10_1.png","/common/cimg/xz10_2.png","/common/cimg/xz10_3.png","/common/cimg/xz11_1.png","/common/cimg/xz11_2.png","/common/cimg/xz11_3.png","/common/cimg/xz12_1.png","/common/cimg/xz12_2.png","/common/cimg/xz12_3.png","/common/cimg/yw01_1.png","/common/cimg/yw01_2.png","/common/cimg/yw01_3.png","/common/cimg/yw02_1.png","/common/cimg/yw02_2.png","/common/cimg/yw02_3.png","/common/cimg/yw03_1.png","/common/cimg/yw03_2.png","/common/cimg/yw03_3.png","/common/cimg/yw04_1.png","/common/cimg/yw04_2.png","/common/cimg/yw04_3.png","/common/cimg/yw05_1.png","/common/cimg/yw05_2.png","/common/cimg/yw05_3.png","/common/cimg/yw06_1.png","/common/cimg/yw06_2.png","/common/cimg/yw06_3.png","/common/cimg/yw07_1.png","/common/cimg/yw07_2.png","/common/cimg/yw07_3.png","/common/cimg/yw08_1.png","/common/cimg/yw08_2.png","/common/cimg/yw08_3.png","/common/cimg/yw09_1.png","/common/cimg/yw09_2.png","/common/cimg/yw09_3.png","/common/cimg/yw10_1.png","/common/cimg/yw10_2.png","/common/cimg/yw10_3.png","/common/cimg/yw11_1.png","/common/cimg/yw11_2.png","/common/cimg/yw11_3.png","/common/cimg/yw12_1.png","/common/cimg/yw12_2.png","/common/cimg/yw12_3.png","/common/cimg/yw13_1.png","/common/cimg/yw13_2.png","/common/cimg/yw13_3.png","/common/cimg/yw14_1.png","/common/cimg/yw14_2.png","/common/cimg/yw14_3.png"
+    ],
+    charIndex: 0,
+    currentChar: '/common/cimg/hz302.png',
+
+    backgroundList: [
+      "/common/bcgi/ecall.jpg","/common/bcgi/空_夕空.jpg","/common/bcgi/空_夕_冬.jpg","/common/bcgi/空_夕_夏.jpg","/common/bcgi/空_夕_春.jpg","/common/bcgi/空_夕_秋.jpg","/common/bcgi/空_夜_冬.jpg","/common/bcgi/空_夜_夏.jpg","/common/bcgi/空_夜_春.jpg","/common/bcgi/空_夜_秋.jpg","/common/bcgi/空_昼_冬.jpg","/common/bcgi/空_昼_夏.jpg","/common/bcgi/空_昼_春.jpg","/common/bcgi/空_昼_秋.jpg","/common/bcgi/画面_白.jpg","/common/bcgi/画面_黒.jpg"
+    ],
+    bgIndex: 0,
+    currentBg: '/common/bcgi/空_夕空.jpg',
+
+    cguishow: true,
+    lhchshow: true,
+    lhuishow: true,
+  },
+
+  onInit() {
+    this.initImages();
+    this.loadSavedIndex();
+  },
+
+  loadSavedIndex() {
+    const self = this;
+    storage.get({
+      key: 'cgLastIndex',
+      success: function(data) {
+        const savedIndex = parseInt(data);
+        if (!isNaN(savedIndex) && savedIndex >= 0 && savedIndex < self.cgList.length) {
+          self.cgIndex = savedIndex;
+          self.currentCG = self.cgList[self.cgIndex];
         }
-      })
-    },
-    initImages() {
-      this.currentCG = this.cgList.length > 0 ? this.cgList[0] : ''
-      this.currentChar = this.characterList.length > 0 ? this.characterList[0] : ''
-      this.currentBg = this.backgroundList.length > 0 ? this.backgroundList[0] : ''
-      console.log('图片初始化完成，CG:', this.currentCG)
-    },
-    hidcgui() {
-      this.cguishow = !this.cguishow
-    },
-    hidlhch() {
-      this.lhchshow = !this.lhchshow
-    },
-    hidlhui() {
-      this.lhuishow = !this.lhuishow
-    },
-    showcg() {
-      this.jump = false
-      this.cgshow = true
-      this.lhshow = false
-      this.sceneshow = false
-      if (this.cgList.length > 0 && this.cgIndex < this.cgList.length) {
-        this.currentCG = this.cgList[this.cgIndex]
       }
-      console.log('进入CG鉴赏，当前CG:', this.currentCG)
-    },
-    showlh() {
-      this.jump = false
-      this.cgshow = false
-      this.lhshow = true
-      this.sceneshow = false
-      if (this.characterList.length > 0 && this.charIndex < this.characterList.length) {
-        this.currentChar = this.characterList[this.charIndex]
+    });
+  },
+
+  saveCGIndex() {
+    const self = this;
+    storage.set({
+      key: 'cgLastIndex',
+      value: String(self.cgIndex),
+      fail: function(error) {
+        console.error('CG索引保存失败:', error);
       }
-      if (this.backgroundList.length > 0 && this.bgIndex < this.backgroundList.length) {
-        this.currentBg = this.backgroundList[this.bgIndex]
-      }
-      console.log('进入立绘鉴赏，当前角色:', this.currentChar, '背景:', this.currentBg)
-    },
-    showscene() {
-      this.jump = false
-      this.cgshow = false
-      this.lhshow = false
-      this.sceneshow = true
-      console.log('进入场景鉴赏')
-    },
-    lastcg() {
-      if (this.cgList.length === 0) return
-      this.cgIndex = (this.cgIndex - 1 + this.cgList.length) % this.cgList.length
-      this.currentCG = this.cgList[this.cgIndex]
-    },
-    entercg() {
-      if (this.cgList.length === 0) return
-      this.cgIndex = (this.cgIndex + 1) % this.cgList.length
-      this.currentCG = this.cgList[this.cgIndex]
-    },
-    lastlh() {
-      if (this.characterList.length === 0) return
-      this.charIndex = (this.charIndex - 1 + this.characterList.length) % this.characterList.length
-      this.currentChar = this.characterList[this.charIndex]
-    },
-    enterlh() {
-      if (this.characterList.length === 0) return
-      this.charIndex = (this.charIndex + 1) % this.characterList.length
-      this.currentChar = this.characterList[this.charIndex]
-    },
-    lastcgb() {
-      if (this.backgroundList.length === 0) return
-      this.bgIndex = (this.bgIndex - 1 + this.backgroundList.length) % this.backgroundList.length
-      this.currentBg = this.backgroundList[this.bgIndex]
-    },
-    entercgb() {
-      if (this.backgroundList.length === 0) return
-      this.bgIndex = (this.bgIndex + 1) % this.backgroundList.length
-      this.currentBg = this.backgroundList[this.bgIndex]
-    },
-    back() {
-      if (this.jump === true) {
-        router.back({ uri: 'pages/more' })
-      } else {
-        this.jump = true
-        this.cgshow = false
-        this.lhshow = false
-        this.sceneshow = false
-        console.log('返回主菜单')
-      }
-    },
-    lastsc() {
-      console.log('上一个场景')
-    },
-    entersc() {
-      console.log('下一个场景')
-    },
-    loadStart() {
-      console.log('开始场景鉴赏')
+    });
+  },
+
+  initImages() {
+    if (this.cgList.length > 0) this.currentCG = this.cgList[0];
+    if (this.characterList.length > 0) this.currentChar = this.characterList[0];
+    if (this.backgroundList.length > 0) this.currentBg = this.backgroundList[0];
+  },
+
+  // ================= 页面切换方法 =================
+  hidcgui(){
+    this.cguishow = !this.cguishow;
+  },
+  hidlhch(){
+    this.lhchshow = !this.lhchshow;
+  },
+  hidlhui(){
+    this.lhuishow = !this.lhuishow;
+  },
+  showcg() {
+    this.jump = false;
+    this.cgshow = true;
+    this.lhshow = false;
+    if (this.cgList.length > 0 && this.cgIndex < this.cgList.length) {
+      this.currentCG = this.cgList[this.cgIndex];
     }
+  },
+
+  showlh() {
+    this.jump = false;
+    this.cgshow = false;
+    this.lhshow = true;
+    if (this.characterList.length > 0 && this.charIndex < this.characterList.length) {
+      this.currentChar = this.characterList[this.charIndex];
+    }
+    if (this.backgroundList.length > 0 && this.bgIndex < this.backgroundList.length) {
+      this.currentBg = this.backgroundList[this.bgIndex];
+    }
+  },
+
+  // ================= 图片切换方法 =================
+
+  // 通用图片切换方法
+  switchImage(listName, indexName, currentName, direction, callback) {
+    const list = this[listName];
+    if (list.length === 0) return;
+    this[indexName] = (this[indexName] + direction + list.length) % list.length;
+    this[currentName] = list[this[indexName]];
+    if (callback) callback();
+  },
+
+  // CG切换
+  lastcg() { this.switchImage('cgList', 'cgIndex', 'currentCG', -1, () => this.saveCGIndex()); },
+  entercg() { this.switchImage('cgList', 'cgIndex', 'currentCG', 1, () => this.saveCGIndex()); },
+
+  // 立绘切换
+  lastlh() { this.switchImage('characterList', 'charIndex', 'currentChar', -1); },
+  enterlh() { this.switchImage('characterList', 'charIndex', 'currentChar', 1); },
+
+  // 背景切换
+  lastcgb() { this.switchImage('backgroundList', 'bgIndex', 'currentBg', -1); },
+  entercgb() { this.switchImage('backgroundList', 'bgIndex', 'currentBg', 1); },
+
+  back() {
+    if (this.jump === true) {
+      router.back({ uri: 'pages/more' });
+    } else {
+      this.jump = true;
+      this.cgshow = false;
+      this.lhshow = false;
+    }
+  },
+
+  // 长按快速切换相关
+  autoSwitchTimer: null,
+  autoSwitchStopTimer: null,
+  autoSwitchDelay: 300,
+  switchDirection: null,
+
+  clickLastCG() {
+    this.stopAutoSwitch();
+    this.lastcg();
+  },
+  clickNextCG() {
+    this.stopAutoSwitch();
+    this.entercg();
+  },
+  clickLastBg() {
+    this.stopAutoSwitch();
+    this.lastcgb();
+  },
+  clickNextBg() {
+    this.stopAutoSwitch();
+    this.entercgb();
+  },
+  clickLastChar() {
+    this.stopAutoSwitch();
+    this.lastlh();
+  },
+  clickNextChar() {
+    this.stopAutoSwitch();
+    this.enterlh();
+  },
+  doAutoSwitch() {
+    const self = this;
+    if (!self.switchDirection) return;
+    if (self.switchDirection === 'last') {
+      self.lastcg();
+    } else if (self.switchDirection === 'next') {
+      self.entercg();
+    }
+    self.autoSwitchDelay = Math.max(50, self.autoSwitchDelay - 20);
+    self.autoSwitchTimer = setTimeout(function() {
+      self.doAutoSwitch();
+    }, self.autoSwitchDelay);
+  },
+  startLastCG() {
+    this.stopAutoSwitch();
+    this.switchDirection = 'last';
+    this.autoSwitchDelay = 300;
+    this.lastcg();
+    this.doAutoSwitch();
+    this.autoSwitchStopTimer = setTimeout(function() {
+      this.stopAutoSwitch();
+    }.bind(this), 3000);
+  },
+  startNextCG() {
+    this.stopAutoSwitch();
+    this.switchDirection = 'next';
+    this.autoSwitchDelay = 300;
+    this.entercg();
+    this.doAutoSwitch();
+    this.autoSwitchStopTimer = setTimeout(function() {
+      this.stopAutoSwitch();
+    }.bind(this), 3000);
+  },
+  startLastBg() {
+    this.stopAutoSwitch();
+    this.lastcgb();
+    this.autoSwitchTimer = setInterval(() => { this.lastcgb(); }, 200);
+    this.autoSwitchStopTimer = setTimeout(() => { this.stopAutoSwitch(); }, 5000);
+  },
+  startNextBg() {
+    this.stopAutoSwitch();
+    this.entercgb();
+    this.autoSwitchTimer = setInterval(() => { this.entercgb(); }, 200);
+    this.autoSwitchStopTimer = setTimeout(() => { this.stopAutoSwitch(); }, 5000);
+  },
+  startLastChar() {
+    this.stopAutoSwitch();
+    this.lastlh();
+    this.autoSwitchTimer = setInterval(() => { this.lastlh(); }, 200);
+    this.autoSwitchStopTimer = setTimeout(() => { this.stopAutoSwitch(); }, 5000);
+  },
+  startNextChar() {
+    this.stopAutoSwitch();
+    this.enterlh();
+    this.autoSwitchTimer = setInterval(() => { this.enterlh(); }, 200);
+    this.autoSwitchStopTimer = setTimeout(() => { this.stopAutoSwitch(); }, 5000);
+  },
+  stopAutoSwitch() {
+    if (this.autoSwitchTimer) {
+      clearTimeout(this.autoSwitchTimer);
+      this.autoSwitchTimer = null;
+    }
+    if (this.autoSwitchStopTimer) {
+      clearTimeout(this.autoSwitchStopTimer);
+      this.autoSwitchStopTimer = null;
+    }
+    this.autoSwitchDelay = 300;
+    this.switchDirection = null;
   }
+};
 </script>
+
+<style>
+.page {
+  flex-direction: column;
+  align-items: center;
+  width: 192px;
+  height: 490px;
+  background-color: #bbbbbb;
+  overflow: hidden;
+}
+
+.bcg {
+  position: absolute;
+  width: 192px;
+  height: 490px;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  object-fit: cover;
+}
+
+.bt {
+  position: absolute;
+  bottom: 0;
+  width: 192px;
+  z-index: 5;
+}
+
+.hd {
+  position: absolute;
+  top: 0;
+  width: 192px;
+  z-index: 5;
+}
+
+.page2 {
+  flex-direction: column;
+  align-items: center;
+  width: 192px;
+  height: 490px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.header {
+  width: 192px;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 8px;
+  z-index: 10;
+}
+
+.header-menu {
+  position: relative;
+  margin-top: 11px;
+}
+
+.title {
+  font-size: 30px;
+  color: #ebebeb;
+  font-weight: bold;
+}
+
+.content {
+  width: 176px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.726);
+  border-radius: 9px;
+  border: 1px solid #e0e0e0;
+  margin: 9px;
+  z-index: 2;
+}
+
+.mid {
+  font-size: 28px;
+  color: #000000;
+  font-weight: 800;
+}
+
+.cgscroll {
+  width: 192px;
+  height: 490px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.cgimg {
+  width: 336px;
+  height: 490px;
+  object-fit: cover;
+}
+
+.character {
+  position: absolute;
+  top: 65px;
+  left: 98px;
+  width: 140px;
+  height: 360px;
+  object-fit: contain;
+  z-index: 3;
+}
+
+.lhscroll {
+  width: 192px;
+  height: 490px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.lhcontent {
+  width: 336px;
+  height: 490px;
+  position: relative;
+}
+
+.backgroundimg {
+  position: absolute;
+  width: 336px;
+  height: 490px;
+  object-fit: cover;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.info-container {
+  position: absolute;
+  bottom: 110px;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+.info-text {
+  font-size: 22px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.btn-container {
+  position: absolute;
+  bottom: 55px;
+  width: 192px;
+  height: 50px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 15;
+}
+
+.nav-btn {
+  width: 50px;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-btn-wrap {
+  position: absolute;
+  bottom: 0;
+  width: 192px;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 2px solid #333333;
+}
+
+.back-btn-text {
+  font-size: 26px;
+  color: #333333;
+  text-align: center;
+}
+</style>

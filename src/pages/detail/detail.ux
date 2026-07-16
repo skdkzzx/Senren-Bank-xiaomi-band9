@@ -1,153 +1,122 @@
 <template>
   <div class="page" onswipe="pageSwipe" onlongpress="displayPage" onclick="playPage">
+
+    <!-- 背景与立绘容器 -->
     <scroll id="bgScroll" class="bg-scroll" scroll-x="true" scroll-y="{{false}}" bounces="false">
       <div class="bg-content">
         <image class="backgroundimg {{currentBackgroundScaleClass}}" src="{{currentBackground}}" onerror="onImageError('background', currentBackground, $event)"></image>
-        <block if="{{showNextBackground}}">
-          <image class="backgroundimg next-background {{nextBackgroundScaleClass}}" src="{{nextBackground}}" onerror="onImageError('nextBackground', nextBackground, $event)"></image>
-        </block>
-        <block if="{{characterimg}}">
-          <div class="character-container">
-            <image class="characterimg {{currentCharacterScaleClass}}" src="{{characterimg}}" onerror="onImageError('character', characterimg, $event)"></image>
-          </div>
-        </block>
-        <block if="{{nextCharacterImg && showNextCharacter}}">
-          <div class="character-container">
-            <image class="characterimg next-character {{nextCharacterScaleClass}}" src="{{nextCharacterImg}}" onerror="onImageError('nextCharacter', nextCharacterImg, $event)"></image>
-          </div>
-        </block>
+        <image class="backgroundimg next-background {{nextBackgroundScaleClass}}" src="{{nextBackground}}" if="{{showNextBackground}}" onerror="onImageError('nextBackground', nextBackground, $event)"></image>
+        <!-- 立绘图层 -->
+        <div class="character-container" if="{{characterimg}}">
+          <image class="characterimg {{currentCharacterScaleClass}}" src="{{characterimg}}" onerror="onImageError('character', characterimg, $event)"></image>
+        </div>
+        <!-- 下一张立绘 -->
+        <div class="character-container" if="{{nextCharacterImg && showNextCharacter}}">
+          <image class="characterimg next-character {{nextCharacterScaleClass}}" src="{{nextCharacterImg}}" onerror="onImageError('nextCharacter', nextCharacterImg, $event)"></image>
+        </div>
       </div>
     </scroll>
-    <block if="{{cgimg || showNextCg}}">
-      <scroll id="cgScroll" class="cg-scroll" scroll-x="true" scroll-y="{{false}}" bounces="false">
-        <div class="cg-content" style="width: {{cgContentWidth}}px;">
-          <block if="{{cgimg}}">
-            <image class="cg-image" style="width: {{cgContentWidth}}px; object-fit: {{cgObjectFit}};" src="{{cgimg}}" onerror="onImageError('cg', cgimg, $event)"></image>
-          </block>
-          <block if="{{showNextCg}}">
-            <image class="cg-image next-cg" style="width: {{cgContentWidth}}px; object-fit: {{cgObjectFit}};" src="{{nextCg}}" onerror="onImageError('nextCg', nextCg, $event)"></image>
-          </block>
-        </div>
+
+    <!-- CG图层 -->
+    <scroll id="cgScroll" class="cg-scroll" scroll-x="true" scroll-y="{{false}}" bounces="false" if="{{cgimg || showNextCg}}">
+      <div class="cg-content" style="width: {{cgContentWidth}}px;">
+        <image class="cg-image" style="width: {{cgContentWidth}}px; object-fit: {{cgObjectFit}};" src="{{cgimg}}" if="{{cgimg}}" onerror="onImageError('cg', cgimg, $event)"></image>
+        <image class="cg-image next-cg" style="width: {{cgContentWidth}}px; object-fit: {{cgObjectFit}};" src="{{nextCg}}" if="{{showNextCg}}" onerror="onImageError('nextCg', nextCg, $event)"></image>
+      </div>
+    </scroll>
+
+    <!-- 对话框 -->
+    <image class="board" src="/pages/detail/board.png" onclick="nextPage" if="{{pageShow && !hideText && !isEnding}}"></image>
+
+    <!-- 角色名 -->
+    <text class="character" style="color: {{viewed ? readColor : unreadColor}}; font-weight: {{boldText ? 'bold' : 'normal'}}; font-size: {{characterNameFontSize}}px; height: {{characterNameFontSize + 10}}px;" if="{{pageShow && !hideText && !isEnding}}">{{displayCharacter}}</text>
+
+    <!-- 文本内容 -->
+    <scroll id="Scroll" class="scroll2" style="top: {{300 + characterNameFontSize + 14}}px;" onclick="nextPage" scroll-y="{{true}}" bounces="{{true}}" if="{{!isEnding}}">
+      <text class="contect" style="color: {{viewed ? readColor : unreadColor}}; font-size: {{currentTextFontSize}}px; font-weight: {{boldText ? 'bold' : 'normal'}};" if="{{pageShow && !hideText}}">{{displayText}}</text>
+    </scroll>
+
+    <!-- 黑色遮罩层 -->
+    <div class="background-mask" style="background-color: {{maskColor}};" if="{{isAnimating}}"></div>
+
+    <!-- 闪光弹白色遮罩层 -->
+    <div class="flashbang-mask" if="{{showFlashbang}}" onclick="nextPage" style="opacity: {{flashbangOpacity}};"></div>
+
+    <!-- 控制按钮 -->
+    <div class="skip-btn2" if="{{isAutoing && !contrlcenterShow && !isAnimating && !isEnding}}" onclick="stopAutoplay">
+      <text>停止自动播放</text>
+    </div>
+    <div class="skip-btn3" if="{{isGoing && !contrlcenterShow && !isAnimating && !isEnding}}" onclick="stopQuickGo">
+      <text>停止快进</text>
+    </div>
+    <div class="skip-btn4" if="{{isBacking && !contrlcenterShow && !isAnimating && !isEnding}}" onclick="stopQuickBack">
+      <text>停止快退</text>
+    </div>
+
+    <!-- 选择选项 -->
+    <div class="choose" if="{{choose && pageShow && !isAnimating && !isEnding}}">
+      <text class="choosetext" onclick="choose1c" if="{{choose1Visible}}" style="color: {{choose1Color}};">{{choose1}}</text>
+      <text class="choosetext" onclick="choose2c" if="{{choose2Visible}}" style="color: {{choose2Color}};">{{choose2}}</text>
+      <text class="choosetext" onclick="choose3c" if="{{choose3Visible}}" style="color: {{choose3Color}};">{{choose3}}</text>
+      <text class="choosetext" onclick="choose4c" if="{{choose4Visible}}" style="color: {{choose4Color}};">{{choose4}}</text>
+      <text class="choosetext" onclick="choose5c" if="{{choose5Visible}}" style="color: {{choose5Color}};">{{choose5}}</text>
+    </div>
+
+    <!-- 控制中心 -->
+    <div class="page1" if="{{contrlcenterShow && !isAnimating && !isEnding}}" onswipe="controlCenterSwipe">
+      <scroll id="mainScroll" class="scroll" scroll-y="{{true}}" bounces="{{true}}">
+        <text class="load2">{{nowTime}} | {{readProgress}}</text>
+        <text class="load" onclick="hidecontrlcenter">返回</text>
+        <text class="load" onclick="saveconShow">保存</text>
+        <text class="load" onclick="loadconShow">加载</text>
+        <text class="load" onclick="quickSave">快速存档</text>
+        <text class="load" onclick="loadStart(1)">快速读档</text>
+        <text class="load" onclick="indexRoute">返回主页</text>
+        <text class="load" onclick="settingsRoute">设置</text>
+        <text class="load" onclick="lctRoute">流程图</text>
+        <text class="load" onclick="autoplay" if="{{!isBacking && !isGoing}}">{{isAutoing ? '停止自动播放' : '自动播放'}}</text>
+        <text class="load" onclick="quickgo" if="{{!isBacking && !isAutoing}}">{{isGoing ? '停止快进' : '快进'}}</text>
+        <text class="load" onclick="quickback" if="{{!isAutoing && !isGoing}}">{{isBacking ? '停止快退' : '快退'}}</text>
+        <text class="load2"></text>
       </scroll>
-    </block>
-    <block if="{{pageShow && !hideText && !isEnding}}">
-      <image class="board" src="/pages/detail/board.png" onclick="nextPage"></image>
-    </block>
-    <block if="{{pageShow && !hideText && !isEnding}}">
-      <text class="character" style="color: {{viewed ? readColor : unreadColor}}; font-weight: {{boldText ? 'bold' : 'normal'}}; font-size: {{characterNameFontSize}}px; height: {{characterNameFontSize + 10}}px;">{{displayCharacter}}</text>
-    </block>
-    <block if="{{!isEnding}}">
-      <scroll id="Scroll" class="scroll2" style="top: {{300 + characterNameFontSize + 14}}px;" scroll-y="{{true}}" onclick="nextPage" bounces="true">
-        <block if="{{pageShow && !hideText}}">
-          <text class="contect" style="color: {{viewed ? readColor : unreadColor}}; font-size: {{currentTextFontSize}}px; font-weight: {{boldText ? 'bold' : 'normal'}};">{{displayText}}</text>
-        </block>
+    </div>
+
+    <!-- 读档页面 -->
+    <div class="page1" if="{{loadShow && !isAnimating && !isEnding}}" onswipe="loadSaveSwipe">
+      <text class="load3">点击跳转至对应页面</text>
+      <scroll id="loadScroll" class="scroll" scroll-y="{{true}}" bounces="{{true}}">
+        <div class="save-item" for="{{(index, item) in saveSlots}}" onclick="loadSlot(index + 1)">
+          <text class="load">存档{{index + 1}}: {{item.text}}</text>
+        </div>
+        <text class="load2"></text>
       </scroll>
-    </block>
-    <block if="{{isAnimating}}">
-      <div class="background-mask" style="background-color: {{maskColor}};"></div>
-    </block>
-    <block if="{{showFlashbang}}">
-      <div class="flashbang-mask" onclick="nextPage" style="opacity: {{flashbangOpacity}};"></div>
-    </block>
-    <block if="{{isAutoing && !contrlcenterShow && !isAnimating && !isEnding}}">
-      <div class="skip-btn2" onclick="stopAutoplay">
-        <text>停止自动播放</text>
+      <div class="back-btn-wrap" onclick="loadconShow">
+        <text class="back-btn-text">返回</text>
       </div>
-    </block>
-    <block if="{{isGoing && !contrlcenterShow && !isAnimating && !isEnding}}">
-      <div class="skip-btn3" onclick="stopQuickGo">
-        <text>停止快进</text>
-      </div>
-    </block>
-    <block if="{{isBacking && !contrlcenterShow && !isAnimating && !isEnding}}">
-      <div class="skip-btn4" onclick="stopQuickBack">
-        <text>停止快退</text>
-      </div>
-    </block>
-    <block if="{{choose && pageShow && !isAnimating && !isEnding}}">
-      <div class="choose">
-        <block if="{{choose1Visible}}">
-          <text class="choosetext" onclick="choose1c" style="color: {{choose1Color}};">{{choose1}}</text>
-        </block>
-        <block if="{{choose2Visible}}">
-          <text class="choosetext" onclick="choose2c" style="color: {{choose2Color}};">{{choose2}}</text>
-        </block>
-        <block if="{{choose3Visible}}">
-          <text class="choosetext" onclick="choose3c" style="color: {{choose3Color}};">{{choose3}}</text>
-        </block>
-        <block if="{{choose4Visible}}">
-          <text class="choosetext" onclick="choose4c" style="color: {{choose4Color}};">{{choose4}}</text>
-        </block>
-        <block if="{{choose5Visible}}">
-          <text class="choosetext" onclick="choose5c" style="color: {{choose5Color}};">{{choose5}}</text>
-        </block>
-      </div>
-    </block>
-    <block if="{{contrlcenterShow && !isAnimating && !isEnding}}">
-      <div class="page1" onswipe="controlCenterSwipe">
-        <scroll id="mainScroll" class="scroll" scroll-y="{{true}}" bounces="true">
-          <text class="load2">{{nowTime}} | {{readProgress}}</text>
-          <text class="load" onclick="hidecontrlcenter">返回</text>
-          <text class="load" onclick="saveconShow">保存</text>
-          <text class="load" onclick="loadconShow">加载</text>
-          <text class="load" onclick="quickSave">快速存档</text>
-          <text class="load" onclick="loadStart(1)">快速读档</text>
-          <text class="load" onclick="indexRoute">返回主页</text>
-          <text class="load" onclick="settingsRoute">设置</text>
-          <text class="load" onclick="lctRoute">流程图</text>
-          <block if="{{!isBacking && !isGoing}}">
-            <text class="load" onclick="autoplay">{{isAutoing ? '停止自动播放' : '自动播放'}}</text>
-          </block>
-          <block if="{{!isBacking && !isAutoing}}">
-            <text class="load" onclick="quickgo">{{isGoing ? '停止快进' : '快进'}}</text>
-          </block>
-          <block if="{{!isAutoing && !isGoing}}">
-            <text class="load" onclick="quickback">{{isBacking ? '停止快退' : '快退'}}</text>
-          </block>
-          <text class="load2"></text>
-        </scroll>
-      </div>
-    </block>
-    <block if="{{loadShow && !isAnimating && !isEnding}}">
-      <div class="page1" onswipe="loadSaveSwipe">
-        <text class="load3">点击跳转至对应页面</text>
-        <scroll id="loadScroll" class="scroll" scroll-y="{{true}}" bounces="true">
-          <block for="{{item in saveSlots}}" tid="index">
-            <div class="save-item" onclick="loadSlot(index + 1)">
-              <text class="load">存档{{index + 1}}: {{item.text}}</text>
-            </div>
-          </block>
-          <text class="load2"></text>
-        </scroll>
-        <div class="back-btn-wrap" onclick="loadconShow">
-          <text class="back-btn-text">返回</text>
+    </div>
+
+    <!-- 存档页面 -->
+    <div class="page1" if="{{saveShow && !isAnimating && !isEnding}}" onswipe="loadSaveSwipe">
+      <text class="load3">长按删除存档位</text>
+      <scroll id="saveScroll" class="scroll" scroll-y="{{true}}" bounces="{{true}}">
+        <div class="save-item" for="{{(index, item) in saveSlots}}">
+          <text class="load" onlongpress="deleteSlot(index + 1)" onclick="saveToSlot(index + 1)">存档{{index + 1}}: {{item.text}}</text>
         </div>
-      </div>
-    </block>
-    <block if="{{saveShow && !isAnimating && !isEnding}}">
-      <div class="page1" onswipe="loadSaveSwipe">
-        <text class="load3">长按删除存档位</text>
-        <scroll id="saveScroll" class="scroll" scroll-y="{{true}}" bounces="true">
-          <block for="{{item in saveSlots}}" tid="index">
-            <div class="save-item">
-              <text class="load" onlongpress="deleteSlot(index + 1)" onclick="saveToSlot(index + 1)">存档{{index + 1}}: {{item.text}}</text>
-            </div>
-          </block>
-          <div class="save-add" onclick="addSaveSlot">
-            <text class="load">[ + 添加存档位 ]</text>
-          </div>
-          <text class="load2"></text>
-        </scroll>
-        <div class="back-btn-wrap" onclick="saveconShow">
-          <text class="back-btn-text">返回</text>
+        <div class="save-add" onclick="addSaveSlot">
+          <text class="load">[ + 添加存档位 ]</text>
         </div>
+        <text class="load2"></text>
+      </scroll>
+      <div class="back-btn-wrap" onclick="saveconShow">
+        <text class="back-btn-text">返回</text>
       </div>
-    </block>
-    <block if="{{isEnding && endAnimationDone}}">
-      <div class="end-overlay" onclick="endClickReturn">
-        <text class="end-text">{{endText}}</text>
-      </div>
-    </block>
+    </div>
+
+    <!-- 结局画面覆盖层 -->
+    <div class="end-overlay" if="{{isEnding && endAnimationDone}}" onclick="endClickReturn">
+      <text class="end-text">{{endText}}</text>
+    </div>
+
   </div>
 </template>
 

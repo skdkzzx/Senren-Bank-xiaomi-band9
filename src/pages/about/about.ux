@@ -1,19 +1,23 @@
 <template>
-  <div class="page" onswipe="noax">
-    <image class="bcg" src="/common/bcgi/空_夕空.jpg"></image>
-    <image class="bt" src="/common/bt.png"></image>
-    <image class="hd" src="/common/hd.png"></image>
-    <scroll id="mainScroll" class="scroll" scroll-y="{{true}}">
+  <div class="page" onswipe="noax" style="padding: 0; margin: 0;">
+    <img class="bcg" src="/common/bcgi/空_夕空.jpg"></img>
+    <img class="bt" src="/common/bt.png"></img>
+    <img class="hd" src="/common/hd.png"></img>
+
+    <scroll id="mainScroll" class="scroll" scroll-y="{{true}}" scroll-x="{{false}}">
       <div class="header">
         <text class="title">关于</text>
       </div>
       <div class="content">
         <text class="app-name">千恋 * 万花</text>
         <text class="subtitle">小米手环移植版</text>
-        <block if="{{isFirstVisit}}">
-          <text class="section-title">初次游玩前请仔细阅读以下内容！阅读完毕后即可开始游戏！</text>
-        </block>
+        <text class="author">@hezdaaa</text>
+        <text class="author">适配作者 @skdkzzx</text>
+
+        <text class="section-title" if="{{isFirstVisit}}">初次游玩前请仔细阅读以下内容！阅读完毕后即可开始游戏！</text>
+
         <div class="section-divider"></div>
+
         <div class="instruction-item">
           <text class="bullet">•</text>
           <text class="instruction-text">点击换页</text>
@@ -38,7 +42,9 @@
           <text class="bullet">•</text>
           <text class="instruction-text">上滑隐藏菜单</text>
         </div>
+
         <div class="section-divider"></div>
+
         <div class="update-info">
           <text class="info-text">有问题记得提出反馈</text>
           <text class="info-text">完整安装包进入qq群或在github链接获取</text>
@@ -52,305 +58,267 @@
           <text class="info-text"></text>
           <text class="info-text">注：本快应用为非官方移植</text>
         </div>
+
         <div class="contact-section">
           <text class="section-title">Q群</text>
           <text class="highlight-text">224262549</text>
           <text class="info-text">GitHub开源：https://github.com/hezdaaa/qlwh-mibandported</text>
         </div>
+        <div class="thanks-section">
+          <text class="section-title">特别致谢:</text>
+          <text class="thanks-text">ppc & liuyuze61</text>
+        </div>
+
         <div class="original-info">
           <text class="info-text">移植自视觉小说</text>
           <text class="app-name">千恋 * 万花</text>
-          <text class="app-name">非常感谢 ppc & liuyuze61 !!</text>
           <text class="fun-text">Ciallo～(∠ ·ω< )⌒★</text>
         </div>
-        <block if="{{isFirstVisit}}">
-          <div class="update-info">
-            <text class="info-text">请先进入设置页面调整字体粗细等设置</text>
-          </div>
-        </block>
+        <div class="update-info" if="{{isFirstVisit}}">
+          <text class="info-text">请先进入设置页面调整字体粗细等设置</text>
+        </div>
       </div>
-      <block if="{{isFirstVisit}}">
-        <text class="acknowledge-btn" onclick="acknowledge">我已知晓</text>
-      </block>
-      <text class="title"></text>
+      <!-- 初次访问时显示的底部按钮 -->
+      <text class="acknowledge-btn" if="{{isFirstVisit}}" onclick="acknowledge">我已知晓</text>
+      <div class="scroll-bottom-space"></div>
     </scroll>
-    <block if="{{!isFirstVisit}}">
-      <div class="back-btn-wrap" onclick="back">
-        <text class="back-btn-text">返回</text>
-      </div>
-    </block>
+
+    <!-- 底部居中返回按钮：仅非初次访问时显示 -->
+    <div class="back-btn-wrap" if="{{!isFirstVisit}}" onclick="back">
+      <text class="back-btn-text">返回</text>
+    </div>
   </div>
 </template>
 
-<style>
-  .page {
-    background-color: #bbbbbb;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    position: relative;
-  }
-  .bcg {
-    position: absolute;
-    width: 192px;
-    height: 490px;
-    top: 0;
-    left: 0;
-    z-index: -1;
-  }
-  .bt {
-    position: absolute;
-    bottom: 0;
-    width: 192px;
-    z-index: 5;
-  }
-  .hd {
-    position: absolute;
-    top: 0;
-    width: 192px;
-    z-index: 5;
-  }
-  .scroll {
-    width: 180px;
-    height: 440px;
-    text-align: left;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    z-index: 2;
-    flex: 1;
-  }
-  .header {
-    width: 180px;
-    justify-content: center;
-    align-items: center;
-    margin-top: 13px;
-    margin-right: 0;
-    margin-bottom: 10px;
-    margin-left: 0;
-    z-index: 10;
-  }
-  .title {
-    font-size: 30px;
-    color: #ebebeb;
-    font-weight: bold;
-  }
-  .content {
-    flex-direction: column;
-    align-items: center;
-    width: 174px;
-    background-color: rgba(255, 255, 255, 0.73);
-    border-radius: 9px;
-    padding-top: 12px;
-    padding-right: 12px;
-    padding-bottom: 12px;
-    padding-left: 12px;
-    border-top-color: #e0e0e0;
-    border-right-color: #e0e0e0;
-    border-bottom-color: #e0e0e0;
-    border-left-color: #e0e0e0;
-    border-style: solid;
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-  }
-  .app-name {
-    font-size: 24px;
-    color: #333333;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 6px;
-  }
-  .subtitle {
-    font-size: 22px;
-    color: #666666;
-    text-align: center;
-    margin-bottom: 8px;
-  }
-  .author {
-    font-size: 22px;
-    color: #888888;
-    text-align: center;
-    margin-bottom: 12px;
-  }
-  .section-divider {
-    width: 90%;
-    height: 1px;
-    background-color: #e0e0e0;
-    margin-top: 12px;
-    margin-right: 0;
-    margin-bottom: 12px;
-    margin-left: 0;
-  }
-  .section-title {
-    font-size: 24px;
-    color: #333333;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  .instruction-item {
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    width: 90%;
-    margin-bottom: 6px;
-  }
-  .bullet {
-    font-size: 20px;
-    color: #4a4a4a;
-    margin-right: 8px;
-  }
-  .instruction-text {
-    font-size: 22px;
-    color: #555555;
-  }
-  .fun-text {
-    font-size: 22px;
-    color: #666666;
-    font-style: italic;
-    text-align: center;
-    margin-top: 8px;
-    margin-right: 0;
-    margin-bottom: 8px;
-    margin-left: 0;
-  }
-  .update-info {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 10px;
-    margin-right: 0;
-    margin-bottom: 10px;
-    margin-left: 0;
-  }
-  .info-text {
-    font-size: 22px;
-    color: #666666;
-    text-align: center;
-    margin-bottom: 4px;
-  }
-  .contact-section {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 12px;
-    margin-right: 0;
-    margin-bottom: 12px;
-    margin-left: 0;
-  }
-  .highlight-text {
-    font-size: 24px;
-    color: #1a73e8;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 6px;
-    margin-right: 0;
-    margin-bottom: 6px;
-    margin-left: 0;
-  }
-  .thanks-section {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 12px;
-    margin-right: 0;
-    margin-bottom: 12px;
-    margin-left: 0;
-  }
-  .thanks-text {
-    font-size: 22px;
-    color: #666666;
-    text-align: center;
-    margin-bottom: 4px;
-  }
-  .original-info {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 12px;
-    margin-right: 0;
-    margin-bottom: 12px;
-    margin-left: 0;
-  }
-  .acknowledge-btn {
-    background-color: #1a73e8;
-    color: white;
-    top: 10px;
-    font-size: 22px;
-    padding-top: 9px;
-    padding-right: 16px;
-    padding-bottom: 9px;
-    padding-left: 16px;
-    border-radius: 20px;
-    text-align: center;
-    margin-top: 11px;
-    margin-bottom: 15px;
-  }
-  .back-btn-wrap {
-    position: absolute;
-    bottom: 0;
-    width: 192px;
-    height: 50px;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    background-color: rgba(255, 255, 255, 0.85);
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-    border-color: #333333;
-    border-style: solid;
-  }
-  .back-btn-text {
-    font-size: 26px;
-    color: #333333;
-    text-align: center;
-  }
-</style>
-
 <script>
-  import system from '@system.router'
-  import storage from '@system.storage'
+import router from '@system.router'
+import storage from '@system.storage'
 
-  export default {
-    data: {
-      build: false,
-      isFirstVisit: true
-    },
-    noax() {
-      console.log('swipe event prevented')
-    },
-    onInit() {
-      storage.get({
-        key: 'about_visited2',
-        success: (data) => {
-          if (data === 'true') {
-            this.isFirstVisit = false
-          } else {
-            this.isFirstVisit = true
-          }
-        },
-        fail: () => {
-          this.isFirstVisit = true
+export default {
+  data: {
+    isFirstVisit: true
+  },
+  noax(e) {
+    if (e.direction === 'right' || e.direction === 'left') return;
+  },
+  onInit() {
+    storage.get({
+      key: 'about_visited2',
+      success: (data) => {
+        if (data === 'true') {
+          this.isFirstVisit = false;
+        } else {
+          this.isFirstVisit = true;
         }
-      })
-    },
-    back() {
-      system.back({ uri: 'pages/index' })
-    },
-    setting() {
-      system.replace({ uri: 'pages/settings' })
-    },
-    acknowledge() {
-      storage.set({
-        key: 'about_visited2',
-        value: 'true',
-        success: () => {
-          this.setting()
-        },
-        fail: () => {
-          this.setting()
-        }
-      })
-    }
+      },
+      fail: () => {
+        this.isFirstVisit = true;
+      }
+    });
+  },
+
+  back() {
+    router.back({
+      uri: 'pages/index'
+    })
+  },
+  setting() {
+    router.replace({
+      uri: 'pages/settings'
+    })
+  },
+  acknowledge() {
+    storage.set({
+      key: 'about_visited2',
+      value: 'true',
+      success: () => {
+        this.setting();
+      },
+      fail: () => {
+        this.setting();
+      }
+    });
   }
+};
 </script>
+
+<style>
+.page {
+  flex-direction: column;
+  align-items: center;
+  width: 192px;
+  height: 490px;
+  background-color: #bbbbbb;
+  overflow: hidden;
+}
+.bcg {
+  position: absolute;
+  width: 192px;
+  height: 490px;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+.bt {
+  position: absolute;
+  bottom: 0;
+  width: 192px;
+  z-index: 5;
+}
+.hd {
+  position: absolute;
+  top: 0;
+  width: 192px;
+  z-index: 5;
+}
+.scroll {
+  width: 180px;
+  height: 440px;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+.header {
+  width: 180px;
+  justify-content: center;
+  align-items: center;
+  margin: 13px 0 10px;
+  z-index: 10;
+}
+.title {
+  font-size: 30px;
+  color: #ebebeb;
+  font-weight: bold;
+}
+.content {
+  width: 174px;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.726);
+  border-radius: 9px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+}
+.app-name {
+  font-size: 24px;
+  color: #333333;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 5px;
+}
+.subtitle {
+  font-size: 22px;
+  color: #666666;
+  text-align: center;
+  margin-bottom: 7px;
+}
+.author {
+  font-size: 22px;
+  color: #888888;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 10px 0;
+}
+.section-title {
+  font-size: 24px;
+  color: #333333;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 9px;
+}
+.instruction-item {
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 5px;
+}
+.bullet {
+  font-size: 20px;
+  color: #4a4a4a;
+  margin-right: 7px;
+}
+.instruction-text {
+  font-size: 22px;
+  color: #555555;
+}
+.fun-text {
+  font-size: 22px;
+  color: #666666;
+  font-style: italic;
+  text-align: center;
+  margin: 7px 0;
+}
+.update-info {
+  flex-direction: column;
+  align-items: center;
+  margin: 9px 0;
+}
+.info-text {
+  font-size: 22px;
+  color: #666666;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.contact-section {
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0;
+}
+.highlight-text {
+  font-size: 24px;
+  color: #1a73e8;
+  font-weight: bold;
+  text-align: center;
+  margin: 5px 0;
+}
+.thanks-section {
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0;
+}
+.thanks-text {
+  font-size: 22px;
+  color: #666666;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.original-info {
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0;
+}
+.acknowledge-btn {
+  background-color: #1a73e8;
+  color: white;
+  font-size: 22px;
+  padding: 9px 16px;
+  border-radius: 20px;
+  text-align: center;
+  margin-top: 11px;
+  margin-bottom: 15px;
+}
+.scroll-bottom-space {
+  height: 60px;
+}
+.back-btn-wrap {
+  position: absolute;
+  bottom: 0;
+  width: 192px;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 2px solid #333333;
+}
+.back-btn-text {
+  font-size: 26px;
+  color: #333333;
+  text-align: center;
+}
+</style>
