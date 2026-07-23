@@ -8,20 +8,25 @@
       <text class="title">流程图</text>
     </div>
 
-    <div class="swiper-container">
-      <swiper class="swiper" index="{{page}}" indicator="false" loop="false" onchange="onSwiperChange">
-        <div class="page1" for="{{pages}}" tid="name">
-          <div class="content1">
-            <text class="mid1">{{$item.name}}</text>
-          </div>
-          <scroll class="chapter-scroll" scroll-y="{{true}}" bounces="false">
-            <div for="{{$item.chapters}}" tid="line" class="content" onclick="loadStart($item.line)">
-              <text class="mid">{{$item.label}}</text>
-            </div>
-            <text class="mid" if="{{$item.hasAfter}}" onclick="loadStart($item.afterLine)">后日谈</text>
-          </scroll>
+    <div class="page1">
+      <div class="content1">
+        <text class="mid1">{{pages[page].name}}</text>
+      </div>
+      <scroll class="chapter-scroll" scroll-y="{{true}}" bounces="false">
+        <div for="{{pages[page].chapters}}" tid="line" class="content" onclick="loadStart($item.line)">
+          <text class="mid">{{$item.label}}</text>
         </div>
-      </swiper>
+        <text class="mid" if="{{pages[page].hasAfter}}" onclick="loadStart(pages[page].afterLine)">后日谈</text>
+      </scroll>
+    </div>
+
+    <div class="btn-container">
+      <div class="nav-btn" onclick="prevPage">
+        <img src="/common/back.png"></img>
+      </div>
+      <div class="nav-btn" onclick="nextPage">
+        <img src="/common/go.png"></img>
+      </div>
     </div>
 
     <div class="footer" onclick="back">
@@ -37,8 +42,6 @@ import router from '@system.router'
 export default {
   data: {
     page: 0,
-    isSwitching: false,
-    switchTimer: null,
     pages: [
       {
         name: '共通线',
@@ -198,27 +201,15 @@ export default {
     ]
   },
 
-  onDestroy() {
-    if (this.switchTimer) {
-      clearTimeout(this.switchTimer)
-      this.switchTimer = null
-    }
+  prevPage() {
+    if (this.page > 0) this.page--
   },
 
-  onSwiperChange(e) {
-    if (this.switchTimer) {
-      clearTimeout(this.switchTimer)
-    }
-    this.isSwitching = true
-    this.page = e.index
-    this.switchTimer = setTimeout(() => {
-      this.isSwitching = false
-      this.switchTimer = null
-    }, 150)
+  nextPage() {
+    if (this.page < this.pages.length - 1) this.page++
   },
 
   loadStart(a) {
-    if (this.isSwitching) return
     try {
       storage.set({
         key: 'readProgress',
@@ -284,22 +275,11 @@ export default {
   font-weight: bold;
 }
 
-.swiper-container {
-  width: 192px;
-  height: 380px;
-  overflow: hidden;
-}
-
-.swiper {
-  width: 192px;
-  height: 380px;
-}
-
 .page1 {
   flex-direction: column;
   align-items: center;
   width: 192px;
-  height: 380px;
+  height: 320px;
 }
 
 .content1 {
@@ -310,13 +290,12 @@ export default {
   background-color: rgba(0, 0, 0, 0.315);
   border-radius: 9px;
   border: 1px solid #e0e0e0;
-  margin-top: 9px;
   margin-bottom: 9px;
 }
 
 .chapter-scroll {
   width: 180px;
-  height: 320px;
+  height: 260px;
   flex-direction: column;
   align-items: center;
 }
@@ -343,6 +322,24 @@ export default {
   flex-direction: column;
   align-items: center;
   width: 180px;
+}
+
+.btn-container {
+  position: absolute;
+  bottom: 55px;
+  width: 192px;
+  height: 50px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 15;
+}
+
+.nav-btn {
+  width: 50px;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
 }
 
 .footer {
