@@ -136,26 +136,26 @@
     justify-content: center;
     align-items: center;
     width: 192px;
-    height: 490px;
+    height: 100%;
     position: relative;
     overflow: hidden;
   }
   .bg-scroll {
     position: absolute;
     width: 192px;
-    height: 490px;
+    height: 100%;
     z-index: 1;
     left: 0;
     top: 0;
   }
   .bg-content {
     width: 336px;
-    height: 490px;
+    height: 100%;
   }
   .backgroundimg {
     position: absolute;
     width: 336px;
-    height: 490px;
+    height: 100%;
     object-fit: cover;
     object-position: left;
     left: 0;
@@ -173,15 +173,15 @@
   .cg-scroll {
     position: absolute;
     width: 192px;
-    height: 490px;
+    height: 100%;
     z-index: 3;
   }
   .cg-content {
-    height: 490px;
+    height: 100%;
   }
   .cg-image {
     position: absolute;
-    height: 490px;
+    height: 100%;
     object-position: center;
   }
   .next-cg {
@@ -190,7 +190,7 @@
   .character-container {
     position: absolute;
     width: 192px;
-    height: 490px;
+    height: 100%;
     overflow-x: hidden;
     overflow-y: hidden;
     top: 0;
@@ -199,7 +199,7 @@
   .characterimg {
     position: absolute;
     width: 192px;
-    height: 490px;
+    height: 100%;
     object-fit: contain;
     z-index: 4;
     top: 180px;
@@ -339,7 +339,7 @@
     justify-content: center;
     align-items: center;
     width: 192px;
-    height: 490px;
+    height: 100%;
     top: 0;
     left: 0;
     z-index: 20;
@@ -449,7 +449,7 @@
   .splash-overlay {
     position: absolute;
     width: 192px;
-    height: 490px;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.75);
     z-index: 200;
     justify-content: center;
