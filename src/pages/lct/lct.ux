@@ -114,7 +114,7 @@ export default {
       {
         name: '丛雨',
         hasAfter: true,
-        afterLine: 38389,
+        afterLine: 38391,
         chapters: [
           { line: 28136, label: 'CHAPTER4-1' },
           { line: 28763, label: 'CHAPTER4-2' },
@@ -143,7 +143,7 @@ export default {
       {
         name: '蕾娜·列支敦瑙尔',
         hasAfter: true,
-        afterLine: 48482,
+        afterLine: 48184,
         chapters: [
           { line: 39159, label: 'CHAPTER3-6' },
           { line: 39875, label: 'CHAPTER4-1' },
